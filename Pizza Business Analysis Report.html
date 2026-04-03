@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pizza Business Analysis Report</title>
+  <style>
+    /* ── Reset ─────────────────────────────────── */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Calibri, Arial, sans-serif;
+      font-size: 11pt;
+      line-height: 1.65;
+      color: #252423;
+      background: #ffffff;
+    }
+
+    /* ── Progress bar ───────────────────────────── */
+    #progress-bar {
+      position: fixed;
+      top: 0; left: 0;
+      height: 4px;
+      width: 0%;
+      background: linear-gradient(90deg, #E8A500, #FFD055);
+      z-index: 9999;
+      transition: width 0.1s linear;
+    }
+
+    /* ── TOC sidebar ────────────────────────────── */
+    #toc {
+      position: fixed;
+      top: 50%;
+      right: 20px;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      z-index: 100;
+    }
+    #toc a {
+      display: block;
+      font-size: 8.5pt;
+      font-weight: 600;
+      color: #aaa;
+      text-decoration: none;
+      padding: 4px 10px;
+      border-left: 2px solid #ddd;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    #toc a:hover { color: #1A3A6B; border-color: #1A3A6B; }
+    #toc a.active { color: #E8A500; border-color: #E8A500; }
+    @media (max-width: 1100px) { #toc { display: none; } }
+
+    /* ── Wrapper ────────────────────────────────── */
+    .wrapper {
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 40px 48px;
+    }
+
+    /* ── Cover ──────────────────────────────────── */
+    .cover {
+      position: relative;
+      text-align: center;
+      padding: 90px 40px 70px;
+      margin: -40px -48px 56px;
+      background: #1A3A6B;
+      overflow: hidden;
+    }
+    /* SVG grain texture overlay */
+    .cover::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.055'/%3E%3C/svg%3E");
+      opacity: 0.4;
+      pointer-events: none;
+    }
+    /* Radial glow */
+    .cover::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 70% 60% at 50% 40%, rgba(232,165,0,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .cover h1 {
+      position: relative;
+      z-index: 1;
+      font-size: 28pt;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+      display: inline-block;
+    }
+    /* Animated underline on title */
+    .cover h1::after {
+      content: '';
+      display: block;
+      height: 3px;
+      background: #E8A500;
+      width: 0;
+      margin: 8px auto 0;
+      border-radius: 2px;
+      animation: underline-grow 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s forwards;
+    }
+    @keyframes underline-grow { to { width: 100%; } }
+    .cover .subtitle {
+      position: relative;
+      z-index: 1;
+      font-size: 14pt;
+      color: #E8A500;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+    .cover .meta {
+      position: relative;
+      z-index: 1;
+      font-size: 10pt;
+      color: rgba(255,255,255,0.6);
+    }
+
+    /* ── How-to guide ───────────────────────────── */
+    .guide-box {
+      background: #F0F4FA;
+      border: 1px solid #C5D4E8;
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin-bottom: 32px;
+    }
+    .guide-box .guide-title {
+      font-size: 10pt;
+      font-weight: 700;
+      color: #1A3A6B;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      margin-bottom: 8px;
+    }
+    .guide-box p {
+      font-size: 10pt;
+      color: #444;
+      margin-bottom: 0;
+    }
+
+    /* ── Section headers ────────────────────────── */
+    h2 {
+      font-size: 16pt;
+      font-weight: 700;
+      color: #1A3A6B;
+      margin: 40px 0 8px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid #E8A500;
+    }
+    h3 {
+      font-size: 12pt;
+      font-weight: 600;
+      color: #1A3A6B;
+      margin: 24px 0 6px;
+    }
+
+    p {
+      margin-bottom: 12px;
+      color: #333;
+    }
+
+    /* ── Research question block ────────────────── */
+    .research-q {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      background: #ffffff;
+      border: 1.5px solid #1A3A6B;
+      border-radius: 6px;
+      padding: 12px 16px;
+      margin: 10px 0 14px;
+    }
+    .research-q .rq-icon {
+      font-size: 14pt;
+      color: #1A3A6B;
+      font-weight: 700;
+      line-height: 1.4;
+      flex-shrink: 0;
+    }
+    .research-q .rq-body { flex: 1; }
+    .research-q .rq-label {
+      font-size: 8pt;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #1A3A6B;
+      margin-bottom: 3px;
+    }
+    .research-q .rq-text {
+      font-size: 10.5pt;
+      color: #1A3A6B;
+      font-style: italic;
+      margin-bottom: 6px;
+    }
+
+    /* ── Dashboard-ref badge ────────────────────── */
+    .dashboard-ref {
+      display: inline-block;
+      background: #1A3A6B;
+      color: #ffffff;
+      font-size: 8pt;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 3px;
+      letter-spacing: 0.04em;
+      transition: box-shadow 0.25s ease, background 0.25s ease;
+      cursor: default;
+    }
+    .dashboard-ref:hover {
+      background: #234e8f;
+      box-shadow: 0 0 0 3px rgba(232,165,0,0.35), 0 0 10px rgba(232,165,0,0.2);
+    }
+
+    /* ── Finding cards ──────────────────────────── */
+    .finding {
+      background: #FFFDF0;
+      border-left: 4px solid #E8A500;
+      border-radius: 0 8px 8px 0;
+      padding: 14px 18px;
+      margin: 16px 0;
+      /* left border animation handled by JS reveal */
+    }
+    .finding .label {
+      font-size: 9pt;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #E8A500;
+      margin-bottom: 4px;
+    }
+
+    /* ── Stat cards ─────────────────────────────── */
+    .stat-row {
+      display: flex;
+      gap: 16px;
+      margin: 16px 0;
+      flex-wrap: wrap;
+    }
+    .stat {
+      flex: 1;
+      min-width: 140px;
+      background: #F0F4FA;
+      border-radius: 8px;
+      padding: 12px 16px;
+      text-align: center;
+      border-top: 3px solid transparent;
+      transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  box-shadow 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  border-color 0.25s ease;
+      cursor: default;
+    }
+    .stat:hover {
+      transform: scale(1.04);
+      box-shadow: 0 8px 24px rgba(26,58,107,0.14), 0 2px 6px rgba(26,58,107,0.08);
+      border-color: #E8A500;
+    }
+    .stat .value {
+      font-size: 20pt;
+      font-weight: 700;
+      color: #1A3A6B;
+    }
+    .stat .label {
+      font-size: 9pt;
+      color: #666;
+    }
+
+    ul, ol {
+      padding-left: 22px;
+      margin-bottom: 12px;
+    }
+    li { margin-bottom: 4px; }
+
+    .highlight {
+      background: #1A3A6B;
+      color: #fff;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-weight: 600;
+      font-size: 10pt;
+    }
+
+    .footer {
+      margin-top: 56px;
+      padding-top: 20px;
+      border-top: 1px solid #ddd;
+      font-size: 9pt;
+      color: #999;
+      text-align: center;
+    }
+
+    /* ── Scroll-reveal base states ──────────────── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.55s ease, transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    /* Finding border-left animate on reveal */
+    .finding.reveal {
+      border-left-width: 0;
+      transition: opacity 0.55s ease,
+                  transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  border-left-width 0.4s ease 0.3s;
+    }
+    .finding.reveal.visible {
+      border-left-width: 4px;
+    }
+
+    /* ── Print safety ───────────────────────────── */
+    @media print {
+      body { margin: 0; }
+      .page-break { page-break-before: always; }
+      .no-print, #toc, #progress-bar { display: none; }
+
+      /* Disable all animations */
+      *, *::before, *::after {
+        animation: none !important;
+        transition: none !important;
+      }
+      .reveal { opacity: 1 !important; transform: none !important; }
+      .finding.reveal { border-left-width: 4px !important; }
+
+      /* Restore cover for print */
+      .cover {
+        margin: 0;
+        padding: 60px 40px 50px;
+        background: #1A3A6B !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .cover h1::after { width: 100% !important; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Progress bar -->
+<div id="progress-bar"></div>
+<div style="max-width:900px;margin:20px auto;padding:20px 30px;background:#f0f4f8;border-radius:8px;text-align:center;">
+    <h3 style="color:#0f3460;margin-bottom:12px;font-size:1rem;">Download Dataset</h3>
+    <a href="https://github.com/Tommy-Nguyen-Stonera/PowerBI-pizza-retail-business-analysis/raw/main/data_pizza.xlsx" download style="display:inline-block;margin:5px 10px;padding:8px 20px;background:#0f3460;color:white;border-radius:4px;text-decoration:none;font-size:0.85rem;">data_pizza.xlsx</a>
+    <a href="https://github.com/Tommy-Nguyen-Stonera/PowerBI-pizza-retail-business-analysis/raw/main/data_dictionary.xlsx" download style="display:inline-block;margin:5px 10px;padding:8px 20px;background:#0f3460;color:white;border-radius:4px;text-decoration:none;font-size:0.85rem;">data_dictionary.xlsx</a>
+</div>
+
+
+<!-- TOC Sidebar -->
+<nav id="toc" aria-label="Sections">
+  <a href="#sec1">1 · Overview</a>
+  <a href="#sec2">2 · Sales Trends</a>
+  <a href="#sec3">3 · Rankings</a>
+  <a href="#sec4">4 · Ingredients</a>
+  <a href="#sec5">5 · Price–Volume</a>
+  <a href="#sec6">6 · Order Behaviour</a>
+</nav>
+
+<div class="wrapper">
+
+  <!-- Cover -->
+  <div class="cover">
+    <h1>Pizza Retail Business Analysis</h1>
+    <div class="subtitle">Operational &amp; Sales Performance Report</div>
+    <div class="meta">Based on 2015 full-year transaction data</div>
+  </div>
+
+  <!-- How to read this report -->
+  <div class="guide-box reveal">
+    <div class="guide-title">How to use this report</div>
+    
+    
+  </div>
+
+  <!-- Section 1 -->
+  <h2 id="sec1" class="reveal">Section 1 &mdash; Business Overview</h2>
+
+  <h3 class="reveal">1a. Total Revenue</h3>
+  <div class="research-q reveal">
+    <div class="rq-icon">?</div>
+    <div class="rq-body">
+      <div class="rq-label">Research Question</div>
+      <div class="rq-text">What was the total revenue generated by the business in 2015, and how does it benchmark the overall commercial performance of the pizza operation?</div>
+      <span class="dashboard-ref">&#9656; Dashboard: Sales Trends — KPI Cards</span>
+    </div>
+  </div>
+  <p>
+    The business generated total annual revenue across all pizza categories and sizes throughout the 2015 fiscal year. Revenue is driven by a combination of order volume and average unit price, with the Classic category contributing the largest share due to high order frequency.
+  </p>
+
+  <h3 class="reveal">1b. Total Orders &amp; Quantity Sold</h3>
+  <div class="research-q reveal">
+    <div class="rq-icon">?</div>
+    <div class="rq-body">
+      <div class="rq-label">Research Question</div>
+      <div class="rq-text">How many orders were placed and how many individual pizza units were sold in 2015? What does this reveal about the scale and volume of the business?</div>
+      <span class="dashboard-ref">&#9656; Dashboard: Sales Trends — KPI Cards</span>
+    </div>
+  </div>
+  <p>
+    The dataset captures all orders placed during 2015, with each order potentially containing multiple pizza items. Total quantity sold reflects the sum of all individual pizza units across every order. These headline figures establish the operational scale of the business and serve as the baseline for all subsequent analysis.
+  </p>
+
+  <h3 class="reveal">1c. Average Order Value</h3>
+  <div class="research-q reveal">
+    <div class="rq-icon">?</div>
+    <div class="rq-body">
+      <div class="rq-label">Research Question</div>
+      <div class="rq-text">What is the average spend per order? How does this metric inform pricing strategy and identify opportunities for upselling?</div>
+      <span class="dashboard-ref">&#9656; Dashboard: Sales Trends — KPI Cards</span>
+    </div>
+  </div>
+  <p>
+    The average order value (AOV) is calculated as total revenue divided by the number of distinct orders. AOV is a key commercial metric — it reflects the typical spend per customer visit and can be improved through upselling, bundle promotions, and premium product placement. The AOV for this business is consistent with a casual dining / delivery pizza model.
+  </p>
+
+  <div class="finding reveal">
+    <div class="label">Context</div>
+    These top-level KPIs provide the executive summary of business performance. All section analyses in this report are grounded in these baseline figures, enabling proportional comparisons across categories, time periods, and order types.
+  </div>
+
+  <!-- Section 2 -->
+  <h2 id="sec2" class="page-break reveal">Section 2 &mdash; Sales Trends Analysis</h2>
+
+  <h3 class="reveal">2b. Peak Sales Periods</h3>
+  <div class="research-q reveal">
+    <div class="rq-icon">?</div>
+    <div class="rq-body">
+      <div class="rq-label">Research Question</div>
+      <div class="rq-text">When during the year does daily revenue peak? Are there seasonal patterns that could be leveraged to optimise promotional planning and inventory management?</div>
+      <span class="dashboard-ref">&#9656; Dashboard: Sales Trends — Sales Trends across 2015</span>
+    </div>
+  </div>
+  <p>
+    The peak sales period occurred on <strong>27 November</strong> (Thanksgiving weekend), recording the single highest daily revenue of the year. A secondary seasonal peak is visible in <strong>July</strong>, coinciding with summer demand. Revenue dips notably in <strong>September–October</strong>, suggesting a mid-year slowdown before the holiday uplift.
+  </p>
+
+  <div class="finding reveal">
+    <div class="label">Key Insight</div>
+    Promotional activity timed around Thanksgiving and summer months would likely yield the highest return on marketing spend.
+  </div>
+
+  <h3 class="reveal">2c. Hourly Sales Pattern</h3>
+  <div class="research-q reveal">
+    <div class="rq-icon">?</div>
+    <div class="rq-body">
+      <div class="rq-label">Research Question</div>
+      <div class="rq-text">At what times of day are customers most likely to place orders? How can kitchen staffing and capacity be structured around intraday demand peaks?</div>
+      <span class="dashboard-ref">&#9656; Dashboard: Sales Trends — Sales Trend per Hour</span>
+    </div>
+  </div>
+  <p>
+    Order volume follows a clear intraday pattern. Activity begins around <strong>11:00</strong> (lunch), peaks sharply at <strong>12:00–13:00</strong>, dips in the mid-afternoon, then rises again at <strong>17:00–19:00</strong> (dinner rush). Volume drops significantly after <strong>21:00</strong>. The lunch window (11:00–14:00) and dinner window (17:00–21:00) together account for the majority of daily orders.
+  </p>
+
+  <h3 class="reveal">2d. Weekday vs Weekend Trends</h3>
+  <div class="research-q reveal">
+    <div class="rq-icon">?</div>
+    <div class="rq-body">
+      <div class="rq-label">Research Question</div>
+      <div class="rq-text">Which days of the week generate the most revenue? Should staffing levels and inventory orders be adjusted to match weekly demand variation?</div>
+      <span class="dashboard-ref">&#9656; Dashboard: Sales Trends — Sales Trend by Weekday</span>
+    </div>
+  </div>
+  <p>
+    Friday consistently generates the highest revenue across all weeks, followed by Thursday and Saturday. Monday and Tuesday show the lowest order volumes, suggesting staffing and inventory can be optimised for lighter weekday demand.
+  </p>
+
+  <!-- Section 3 -->
+  <h2 id="sec3" class="page-break reveal">Section 3 &mdash; Category &amp; Pizza Rankings</h2>
+
+  <h3 class="reveal">3a. Category Rankings</h3>
+  <div class="research-q reveal">
+    <div class="rq-icon">?</div>
+    <div class="rq-body">
+      <div class="rq-label">Research Question</div>
+      <div class="rq-text">Which pizza categories lead in revenue and in quantity sold? Do the top revenue categories also dominate volume, or does price per unit create divergence between the two rankings?</div>
+      <span class="dashboard-ref">&#9656; Dashboard: Pizza Ranking — Category by Quantity Sold / Category by Revenue</span>
+    </div>
+  </div>
+  <div class="stat-row">
+    <div class="stat reveal" style="transition-delay:0ms"><div class="value">#1</div><div class="label">Classic (Revenue)</div></div>
+    <div class="stat reveal" style="transition-delay:80ms"><div class="value">#2</div><div class="label">Supreme (Revenue)</div></div>
+    <div class="stat reveal" style="transition-delay:160ms"><div class="value">#3</div><div class="label">Chicken (Revenue)</div></div>
+    <div class="stat reveal" style="transition-delay:240ms"><div class="value">#4</div><div class="label">Veggie (Revenue)</div></div>
+  </div>
+  <p>
+    The revenue ranking is: <span class="highlight">Classic</span> &gt; <span class="highlight">Supreme</span> &gt; <span class="highlight">Chicken</span> &gt; <span class="highlight">Veggie</span>.
+    The quantity ranking is: <span class="highlight">Classic</span> &gt; <span class="highlight">Supreme</span> &gt; <span class="highlight">Veggie</span> &gt; <span class="highlight">Chicken</span>.
+    Chicken generates more revenue per unit than Veggie despite lower volume, indicating a higher average price point in the Chicken category.
+  </p>
+
+  <h3 class="reveal">3b. Individual Pizza Rankings</h3>
+  <div class="research-q reveal">
+    <div class="rq-icon">?</div>
+    <div class="rq-body">
+      <div class="rq-label">Research Question</div>
+      <div class="rq-text">Which individual pizzas are the highest earners and highest sellers? Is there a gap between the pizzas that generate the most revenue and those ordered most frequently?</div>
+      <span class="dashboard-ref">&#9656; Dashboard: Pizza Ranking — Pizzas by Quantity Sold / Pizzas by Revenue</span>
+    </div>
+  </div>
+  <p>
+    Among individual pizzas, the <strong>Thai Chicken Pizza</strong> and <strong>Barbecue Chicken Pizza</strong> lead in revenue generation. Classic pizzas such as the <strong>Classic Deluxe</strong> rank highest by quantity sold, driven by their lower price point and broad appeal. Premium varieties (Calabrese, Mediterrano) appear predominantly in the revenue top-10 despite lower order volumes.
+  </p>
+
+  <!-- Section 4 -->
+  <h2 id="sec4" class="reveal">Section 4 &mdash; Ingredient &amp; Size Analysis</h2>
+
+  <h3 class="reveal">4a. Size Distribution</h3>
+  <div class="research-q reveal">
+    <div class="rq-icon">?</div>
+    <div class="rq-body">
+      <div class="rq-label">Research Question</div>
+      <div class="rq-text">Which pizza sizes are most popular within each category? Do customers prefer larger or smaller formats depending on pizza style, and how should promotional bundles be designed accordingly?</div>
+      <span class="dashboard-ref">&#9656; Dashboard: Pizza Ranking — Sales Volume of different Pizza categories</span>
+    </div>
+  </div>
+  <p>
+    Smaller sizes (S, M, L) dominate sales volume across most categories. Classic and Veggie pizzas are most frequently ordered in Large (L), while Supreme and Chicken categories see stronger Medium (M) demand. XL and XXL sizes contribute the least volume overall but command a higher price per unit, making them margin-positive for the business.
+  </p>
+
+  <div class="finding reveal">
+    <div class="label">Recommendation</div>
+    Focus promotional bundles on M and L sizes for Classic and Veggie — these sizes drive volume. Reserve XL/XXL marketing for premium customer segments.
+  </div>
+
+  <h3 class="reveal">4b. Most Popular Ingredients by Category</h3>
+  <div class="research-q reveal">
+    <div class="rq-icon">?</div>
+    <div class="rq-body">
+      <div class="rq-label">Research Question</div>
+      <div class="rq-text">What are the most frequently appearing ingredients across each pizza category? Which ingredients are so universally used that a supply disruption would impact the entire menu?</div>
+      <span class="dashboard-ref">&#9656; Dashboard: Ingredient Analysis — Ingredients statistics</span>
+    </div>
+  </div>
+  <ul>
+    <li><strong>Classic:</strong> Mozzarella, Tomato Sauce, Pepperoni, Mushrooms, Red Peppers</li>
+    <li><strong>Supreme:</strong> Mozzarella, Tomato Sauce, Chicken, Italian Sausage, Artichoke</li>
+    <li><strong>Chicken:</strong> Mozzarella, Barbecue Sauce, Chicken, Red Onions, Thai Sauce</li>
+    <li><strong>Veggie:</strong> Mozzarella, Tomato Sauce, Spinach, Mushrooms, Garlic, Peppers</li>
+  </ul>
+  <p>Mozzarella and Tomato Sauce appear universally; these are critical supply chain items requiring consistent stock management.</p>
+
+  <!-- Section 5 -->
+  <h2 id="sec5" class="page-break reveal">Section 5 &mdash; Price&ndash;Volume Correlation</h2>
+
+  <h3 class="reveal">5a. Top &amp; Bottom Ranking Groups</h3>
+  <div class="research-q reveal">
+    <div class="rq-icon">?</div>
+    <div class="rq-body">
+      <div class="rq-label">Research Question</div>
+      <div class="rq-text">Which pizzas consistently rank at the top and bottom when both revenue and sales volume are considered? Are there underperforming menu items that contribute so little they are candidates for removal or reformulation?</div>
+      <span class="dashboard-ref">&#9656; Dashboard: Ingredient Analysis — Ingredients Analysis</span>
+    </div>
+  </div>
+  <p>
+    Top-5 pizzas by revenue and quantity include Classic Deluxe, Barbecue Chicken, Thai Chicken, California Chicken, and Spicy Italian. Bottom-5 performers (Brie Carre, Mediterranean, Calabrese, Soppressata, Spinach Supreme) are specialty items with niche appeal. The bottom-5 contribute &lt;3% of total revenue and may be candidates for menu rationalisation.
+  </p>
+
+  <h3 class="reveal">5b. Scatter Analysis: Avg Price vs Total Quantity by Category</h3>
+  <div class="research-q reveal">
+    <div class="rq-icon">?</div>
+    <div class="rq-body">
+      <div class="rq-label">Research Question</div>
+      <div class="rq-text">Is there a measurable relationship between average pizza price and total sales volume across categories? Does price elasticity drive purchasing decisions, and if so, how strong is that effect?</div>
+      <span class="dashboard-ref">&#9656; Dashboard: Sales Efficiency — Correlation of Pizzas Value &amp; Volume / Correlation Coefficient (r)</span>
+    </div>
+  </div>
+  <p>
+    The scatter chart reveals a <strong>negative linear relationship</strong> between average pizza price and total sales volume across the four categories. Categories with lower average prices — notably <em>Classic</em> — achieve the highest sales volumes, while premium-priced categories such as <em>Chicken</em> and <em>Supreme</em> show lower volumes despite higher per-unit revenue.
+  </p>
+  <p>
+    The <strong>Correlation Coefficient (r)</strong> quantifies this relationship. A value close to <strong>&minus;1</strong> indicates a strong inverse relationship between price and demand, consistent with standard price elasticity behaviour.
+  </p>
+
+  <div class="finding reveal">
+    <div class="label">Implication</div>
+    Price sensitivity is a significant driver of purchasing behaviour. Modest price reductions on Chicken and Supreme categories could drive volume uplift that offsets the reduced margin per unit. Classic pizzas, already high-volume, are best positioned for incremental price optimisation.
+  </div>
+
+  <!-- Section 6 -->
+  <h2 id="sec6" class="reveal">Section 6 &mdash; Order Behaviour Analysis</h2>
+
+  <h3 class="reveal">6a. Single-Item vs Multi-Item Orders</h3>
+  <div class="research-q reveal">
+    <div class="rq-icon">?</div>
+    <div class="rq-body">
+      <div class="rq-label">Research Question</div>
+      <div class="rq-text">What proportion of orders contain only one unique pizza type versus multiple varieties? Does this reveal a customer tendency toward variety purchasing that could be exploited through bundle promotions?</div>
+      <span class="dashboard-ref">&#9656; Dashboard: Sales Efficiency — Order Size Segmentation</span>
+    </div>
+  </div>
+  <p>
+    Order composition analysis distinguishes between:
+  </p>
+  <ul>
+    <li><strong>Single-Item orders</strong> — exactly one unique pizza type per order</li>
+    <li><strong>Multi-Item orders</strong> — two or more distinct pizza types in the same order</li>
+  </ul>
+  <p>
+    Multi-item orders represent the <strong>majority of transactions</strong>, indicating that most customers purchase multiple distinct pizza varieties per visit. This pattern supports upselling strategies — for instance, "Add a second pizza" prompts at checkout — as customers are already predisposed to variety purchasing.
+  </p>
+
+  <div class="finding reveal">
+    <div class="label">Recommendation</div>
+    Design bundle promotions targeting multi-item buyers. A "Meal Deal" pairing a Classic with a Chicken or Supreme pizza could increase average order value while reinforcing existing purchase behaviour.
+  </div>
+
+  <h3 class="reveal">6b. Average Time Between Orders</h3>
+  <div class="research-q reveal">
+    <div class="rq-icon">?</div>
+    <div class="rq-body">
+      <div class="rq-label">Research Question</div>
+      <div class="rq-text">How quickly are consecutive orders placed within the same day? Does order frequency slow during peak hours — indicating a kitchen bottleneck — and how can this inform staffing and equipment decisions?</div>
+      <span class="dashboard-ref">&#9656; Dashboard: Sales Efficiency — Avg Time Between Orders</span>
+    </div>
+  </div>
+  <p>
+    Calculated only within the same day (excluding overnight gaps between the last order of one day and the first of the next), the average time between consecutive orders reflects genuine operational throughput. This metric is a proxy for kitchen capacity utilisation — shorter intervals indicate higher sustained throughput; longer intervals may flag bottlenecks during peak hours.
+  </p>
+  <p>
+    Comparing this value against the peak-hour (12:00–13:00 and 18:00–20:00) same-day intervals would identify whether throughput slows during peak demand, helping to size staffing and equipment requirements.
+  </p>
+
+  <div class="footer">
+    Pizza Business Analysis Report &nbsp;|&nbsp; Based on 2015 transaction data &nbsp;|&nbsp; Pizza Retail Business Analysis
+  </div>
+
+</div>
+
+<script>
+  // ── Progress bar ─────────────────────────────────
+  const bar = document.getElementById('progress-bar');
+  function updateProgress() {
+    const scrollTop = window.scrollY;
+    const docH = document.documentElement.scrollHeight - window.innerHeight;
+    bar.style.width = docH > 0 ? (scrollTop / docH * 100) + '%' : '0%';
+  }
+  window.addEventListener('scroll', updateProgress, { passive: true });
+
+  // ── Scroll-reveal (Intersection Observer) ────────
+  const revealEls = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  revealEls.forEach(el => observer.observe(el));
+
+  // ── TOC active section tracking ───────────────────
+  const sections = ['sec1','sec2','sec3','sec4','sec5','sec6'];
+  const tocLinks = document.querySelectorAll('#toc a');
+
+  function updateTOC() {
+    let current = sections[0];
+    sections.forEach(id => {
+      const el = document.getElementById(id);
+      if (el && el.getBoundingClientRect().top <= 120) current = id;
+    });
+    tocLinks.forEach(a => {
+      a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+    });
+  }
+  window.addEventListener('scroll', updateTOC, { passive: true });
+  updateTOC();
+
+  // ── Smooth scroll for TOC clicks ──────────────────
+  tocLinks.forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      const target = document.getElementById(a.getAttribute('href').slice(1));
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+</script>
+
+
+
+
+</body>
+</html>
