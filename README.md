@@ -6,10 +6,10 @@ Sales performance analysis of a pizza retail business using Power BI. Interactiv
 
 ## Key Findings
 
-- Clear revenue patterns by day of week and time of day
-- Certain pizza categories consistently outperform others
-- Order size and frequency vary significantly across product lines
-- Peak hours and seasonal trends visible in the data
+- Friday is the highest-revenue day of the week; lunch (12:00-13:00) and dinner (17:00-19:00) are the busiest periods each day
+- Classic pizza leads all four categories in both revenue and quantity sold, followed by Supreme
+- Most orders contain two or more distinct pizza types; single-item orders are the minority
+- Peak hours are 12:00-13:00 and 17:00-19:00, with the single highest daily revenue recorded on 27 November (Thanksgiving weekend)
 
 ## Tools
 
