@@ -1,0 +1,67 @@
+table 'Slicer Toggle'
+	lineageTag: 3f5005e0-2c21-4701-a856-639d6803d2f2
+
+	measure 'Show Pizza' =
+			
+			VAR SelectedView = SELECTEDVALUE('Slicer Toggle'[View])
+			
+			VAR MaxRankQty =
+			    MAXX(
+			        ALL(Data_pizza[name]),
+			        [Rank Pizza by Quantity]
+			    )
+			
+			VAR MaxRankRev =
+			    MAXX(
+			        ALL(Data_pizza[name]),
+			        [Rank Pizza by Revenue]
+			    )
+			
+			RETURN
+			SWITCH(
+			    SelectedView,
+			    "Top 5 Quantity",  IF([Rank Pizza by Quantity] <= 5, 1, 0),
+			    "Bottom 5 Quantity", IF([Rank Pizza by Quantity] >= MaxRankQty - 4, 1, 0),
+			    "Top 5 Revenue",   IF([Rank Pizza by Revenue] <= 5, 1, 0),
+			    "Bottom 5 Revenue", IF([Rank Pizza by Revenue] >= MaxRankRev - 4, 1, 0)
+			)
+		formatString: 0
+		lineageTag: 9509d68b-05c2-4435-9b9e-374a3adf5724
+
+	measure 'Selected Value' =
+			
+			SWITCH(
+			    SELECTEDVALUE('Slicer Toggle'[View]),
+			    "Top 5 Quantity", [Total Quantity],
+			    "Bottom 5 Quantity", [Total Quantity],
+			    "Top 5 Revenue", [Total Revenue],
+			    "Bottom 5 Revenue", [Total Revenue]
+			)
+		lineageTag: 3c65ca3c-01c5-43e7-b9b1-539d6a4a39f1
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column View
+		lineageTag: 970bc8a6-3d3f-4030-95d6-4cc217580c94
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [View]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Slicer Toggle' = calculated
+		mode: import
+		source =
+				
+				DATATABLE(
+				    "View", STRING,
+				    {
+				        {"Top 5 Quantity"},
+				        {"Bottom 5 Quantity"},
+				        {"Top 5 Revenue"},
+				        {"Bottom 5 Revenue"}
+				    }
+				)
+
+	annotation PBI_Id = f339f3576aa44e3eb39b5b98d2f6982b
+

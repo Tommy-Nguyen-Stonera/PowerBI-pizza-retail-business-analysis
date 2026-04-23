@@ -1,0 +1,72 @@
+table 'Pizza Category'
+	lineageTag: fdda7280-ce1e-4017-af64-a2ec60054f0f
+
+	measure 'Pizza category Filter' =
+			
+			VAR Qty = [Ingredient Quantity]
+			VAR Rev = [Ingredient Revenue]
+			
+			VAR AvgQty =
+			    CALCULATE(
+			        AVERAGEX(
+			            VALUES('ingredients Normalised'[ingredient]),
+			            [Ingredient Quantity]
+			        ),
+			        ALL('ingredients Normalised')
+			    )
+			
+			VAR AvgRev =
+			    CALCULATE(
+			        AVERAGEX(
+			            VALUES('ingredients Normalised'[ingredient]),
+			            [Ingredient Revenue]
+			        ),
+			        ALL('ingredients Normalised')
+			    )
+			
+			VAR CurrentQuadrant = SELECTEDVALUE('Pizza Category'[Quadrant])
+			
+			RETURN
+			SWITCH(
+			    TRUE(),
+			    CurrentQuadrant = "High Quantity / High Revenue" &&
+			        Qty >= AvgQty && Rev >= AvgRev, 1,
+			
+			    CurrentQuadrant = "High Quantity / Low Revenue" &&
+			        Qty >= AvgQty && Rev < AvgRev, 1,
+			
+			    CurrentQuadrant = "Low Quantity / High Revenue" &&
+			        Qty < AvgQty && Rev >= AvgRev, 1,
+			
+			    CurrentQuadrant = "Low Quantity / Low Revenue" &&
+			        Qty < AvgQty && Rev < AvgRev, 1,
+			
+			    0
+			)
+		formatString: 0
+		lineageTag: a2f1760a-2dc0-4cee-94fc-79a004f046c4
+
+	column Quadrant
+		lineageTag: 5f27a6c3-883f-46ff-b34f-99f575264951
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Quadrant]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Pizza Category' = calculated
+		mode: import
+		source =
+				
+				DATATABLE(
+				    "Quadrant", STRING,
+				    {
+				        { "High Quantity / High Revenue" },
+				        { "High Quantity / Low Revenue" },
+				        { "Low Quantity / High Revenue" },
+				        { "Low Quantity / Low Revenue" }
+				    }
+				)
+
+	annotation PBI_Id = f3aa0f7d678a4bee931c08ba8674142f
+

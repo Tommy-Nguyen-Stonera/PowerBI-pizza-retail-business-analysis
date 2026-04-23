@@ -1,0 +1,13 @@
+# Power BI Desktop user-local settings (machine-specific)
+**/.pbi/localSettings.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+
+# Vercel CLI
+vercel/.vercel/

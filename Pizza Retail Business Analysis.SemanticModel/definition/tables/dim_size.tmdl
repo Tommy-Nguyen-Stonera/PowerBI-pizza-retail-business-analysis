@@ -1,0 +1,39 @@
+table dim_size
+	lineageTag: 6e94e958-8c91-4d4c-ac29-f01e0fd10047
+
+	column pizza_size
+		lineageTag: 568499cd-37d0-405d-90c8-ad6383e8a97d
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [pizza_size]
+		sortByColumn: SizeSort
+
+		annotation SummarizationSetBy = Automatic
+
+	column SizeSort
+		formatString: 0
+		lineageTag: e417ef79-4230-4b46-85d4-20931cdd591d
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [SizeSort]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_size = calculated
+		mode: import
+		source =
+				
+				DATATABLE(
+				    "pizza_size", STRING,
+				    "SizeSort", INTEGER,
+				    {
+				        {"S", 1},
+				        {"M", 2},
+				        {"L", 3},
+				        {"XL", 4},
+				        {"XXL", 5}
+				    }
+				)
+
+	annotation PBI_Id = d49e5e506eda40dca89ef3414f6e7a89
+

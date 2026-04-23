@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Report",
+    "displayName": "Pizza Retail Business Analysis"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "1a631f4b-c640-4d7f-b5e2-8e952fd9ac39"
+  }
+}

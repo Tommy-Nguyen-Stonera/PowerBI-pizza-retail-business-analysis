@@ -1,0 +1,40 @@
+relationship 6527e6a0-3042-4e34-b027-15ee71acdb54
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'daily revenue'.date
+	toColumn: LocalDateTable_c2a39ff7-3de9-40d4-803a-bd18b7ee9de4.Date
+
+relationship 25f12464-22a6-49df-bc39-9c0b76544769
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Dim_Time.DateTime
+	toColumn: LocalDateTable_ad2eb87c-7048-4a5a-9546-52454c536dad.Date
+
+relationship a8f6fac4-7a4b-4359-8dea-cdcfccea7141
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Dim_Date.Date
+	toColumn: LocalDateTable_b637c308-ce40-484e-ab4f-6621592cc1bd.Date
+
+relationship ab59dc29-b0ad-6824-8dc4-bc1b4c993d18
+	fromColumn: Data_pizza.date
+	toColumn: Dim_Date.Date
+
+relationship 17a0c48d-44a0-c028-1f98-1a4aeca996aa
+	fromColumn: Data_pizza.DateTime
+	toColumn: Dim_Time.DateTime
+
+relationship ee0d05ce-ec6c-d11d-b37e-3ee94cd942ff
+	fromColumn: Data_pizza.size
+	toColumn: dim_size.pizza_size
+
+relationship 347a3315-f3ae-3b92-8867-cbcf964b5c1e
+	fromColumn: Data_pizza.pizza_id
+	toColumn: dim_pizza.pizza_id
+
+relationship af3914ba-5218-b5dd-8b93-82db4f777447
+	fromColumn: 'Ingredients Normalised'.pizza_id
+	toColumn: dim_pizza.pizza_id
+
+relationship ae2bcb3b-152e-486a-889a-7b0fbba9b44f
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Order Summary Table'.OrderTime
+	toColumn: LocalDateTable_cc5b4035-f5a7-477a-a4cf-21f98dd2fdef.Date
+

@@ -1,0 +1,84 @@
+table 'Ingredients Normalised'
+	lineageTag: b9fa6486-2c1a-45e4-82c5-2fd1b9892ce1
+
+	measure 'Ingredient Quantity' =
+			
+			CALCULATE (
+			    SUM ( Data_pizza[quantity] ),
+			    FILTER (
+			        Data_pizza,
+			        Data_pizza[pizza_id] IN
+			            SELECTCOLUMNS (
+			                FILTER (
+			                    'Ingredients Normalised',
+			                    'Ingredients Normalised'[Ingredient] = SELECTEDVALUE ( 'Ingredients Normalised'[Ingredient])
+			                ),
+			                "pizza_id", 'Ingredients Normalised'[pizza_id]
+			            )
+			    )
+			)
+		formatString: 0
+		lineageTag: 75d1c6cd-7529-4b6e-911b-1495c1b4e8bb
+
+	measure 'Ingredient Revenue' =
+			
+			CALCULATE (
+			    SUM ( Data_pizza[Revenue] ),
+			    FILTER (
+			        Data_pizza,
+			        Data_pizza[pizza_id] IN
+			            SELECTCOLUMNS (
+			                FILTER (
+			                    'Ingredients Normalised',
+			                    'Ingredients Normalised'[Ingredient] = SELECTEDVALUE ( 'Ingredients Normalised'[Ingredient])
+			                ),
+			                "pizza_id", 'Ingredients Normalised'[pizza_id]
+			            )
+			    )
+			)
+		lineageTag: f50fed43-3299-45c9-b423-10aa05f2643a
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column pizza_id
+		dataType: string
+		lineageTag: b52ebcd7-777b-445b-a8e9-ac19b8a05475
+		summarizeBy: none
+		sourceColumn: pizza_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column Ingredient
+		dataType: string
+		lineageTag: ba83db67-7ec3-4e20-870d-52bda04206f3
+		summarizeBy: none
+		sourceColumn: Ingredient
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Ingredients Normalised' = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents("D:\Download\data_pizza.xlsx"), null, true),
+				    Sheet1_Sheet = Source{[Item="Sheet1",Kind="Sheet"]}[Data],
+				    #"Promoted Headers" = Table.PromoteHeaders(Sheet1_Sheet, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"order_id", Int64.Type}, {"date", type date}, {"time", type datetime}, {"pizza_id", type text}, {"quantity", Int64.Type}, {"size", type text}, {"price", type number}, {"name", type text}, {"category", type text}, {"ingredients", type text}}),
+				    #"Sorted Rows" = Table.Sort(#"Changed Type",{{"date", Order.Ascending}}),
+				    #"Changed Type1" = Table.TransformColumnTypes(#"Sorted Rows",{{"date", type date}, {"time", type time}}),
+				    #"Removed Other Columns" = Table.SelectColumns(#"Changed Type1",{"pizza_id", "ingredients"}),
+				    #"Split Column by Delimiter" = Table.SplitColumn(#"Removed Other Columns", "ingredients", Splitter.SplitTextByDelimiter(",", QuoteStyle.Csv), {"ingredients.1", "ingredients.2", "ingredients.3", "ingredients.4", "ingredients.5", "ingredients.6", "ingredients.7", "ingredients.8"}),
+				    #"Changed Type2" = Table.TransformColumnTypes(#"Split Column by Delimiter",{{"ingredients.1", type text}, {"ingredients.2", type text}, {"ingredients.3", type text}, {"ingredients.4", type text}, {"ingredients.5", type text}, {"ingredients.6", type text}, {"ingredients.7", type text}, {"ingredients.8", type text}}),
+				    #"Unpivoted Columns" = Table.UnpivotOtherColumns(#"Changed Type2", {"pizza_id"}, "Attribute", "Value"),
+				    #"Trimmed Text" = Table.TransformColumns(#"Unpivoted Columns",{{"Attribute", Text.Trim, type text}, {"Value", Text.Trim, type text}}),
+				    #"Removed Columns" = Table.RemoveColumns(#"Trimmed Text",{"Attribute"}),
+				    #"Filtered Rows" = Table.SelectRows(#"Removed Columns", each true),
+				    #"Removed Duplicates" = Table.Distinct(#"Filtered Rows"),
+				    #"Renamed Columns" = Table.RenameColumns(#"Removed Duplicates",{{"Value", "Ingredient"}})
+				in
+				    #"Renamed Columns"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

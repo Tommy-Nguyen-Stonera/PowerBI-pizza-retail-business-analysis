@@ -1,0 +1,108 @@
+table Dim_Time
+	lineageTag: 6c2556cc-ea83-489a-bc41-6aceff0f2f0a
+
+	column DailyRevenue
+		lineageTag: 64eab029-9fd7-466b-b83b-67862f2c7d9c
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [DailyRevenue]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column DateTime
+		formatString: General Date
+		lineageTag: 21054ab2-f6c5-40e1-980f-95d66c909a37
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Data_pizza[DateTime]
+
+		variation Variation
+			isDefault
+			relationship: 25f12464-22a6-49df-bc39-9c0b76544769
+			defaultHierarchy: LocalDateTable_ad2eb87c-7048-4a5a-9546-52454c536dad.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column SortKey = ```
+			
+			Dim_Time[DailyRevenue] * 1000000000000000 +
+			VALUE ( FORMAT ( Dim_Time[DateTime], "yyyyMMddHHmmss" ) )
+			
+			```
+		lineageTag: 7d94876c-1b15-409b-bd2e-187a0c7a34cc
+		summarizeBy: count
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Revenue Rank' = ```
+			
+			RANKX(
+			    ALL ( Dim_Time ),
+			    Dim_Time[SortKey],
+			    ,
+			    ASC,
+			    SKIP
+			)
+			
+			```
+		formatString: 0
+		lineageTag: f3e31293-39cb-4166-926a-6193ffaee338
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Revenue Flag' = ```
+			
+			VAR TotalRows = COUNTROWS ( Dim_Time )
+			RETURN
+			SWITCH (
+			    TRUE (),
+			    [Revenue Rank] <= 5, "Bottom Lows",
+			    [Revenue Rank] >= TotalRows - 4, "Peak tops",
+			    "Average"
+			)
+			
+			```
+		lineageTag: 638b2ac1-8268-4a6b-8c7b-165be65b6b40
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column DailyRevenuePerDay = ```
+			
+			CALCULATE(
+			    SUMX(Data_pizza, Data_pizza[quantity] * Data_pizza[price]),
+			    ALLEXCEPT(Data_pizza, Data_pizza[date])
+			)
+			
+			```
+		lineageTag: e5675e23-b975-4c5f-b444-781f582f46bb
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Order Hour' = HOUR(Dim_Time[DateTime])
+		formatString: 0
+		lineageTag: 9baba3d8-cd91-42f4-a9b5-d60da948e6d1
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dim_Time = calculated
+		mode: import
+		source =
+				
+				SUMMARIZE(
+				    Data_pizza,
+				    Data_pizza[DateTime],
+				    "DailyRevenue", SUMX(Data_pizza, Data_pizza[quantity] * Data_pizza[price])
+				)
+
+	annotation PBI_Id = 84eb853a16a7427e8b819ab71e98894e
+

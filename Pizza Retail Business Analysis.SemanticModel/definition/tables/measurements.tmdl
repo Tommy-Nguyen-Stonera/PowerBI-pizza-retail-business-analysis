@@ -1,0 +1,408 @@
+table measurements
+	lineageTag: 63141942-39a4-485c-8d02-306907c086f4
+
+	measure 'Total Revenue' = SUMX(Data_pizza, Data_pizza[quantity] * Data_pizza[price])
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		displayFolder: 01 Core KPIs
+		lineageTag: a1111111-1111-4111-a111-111111111111
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	measure 'Total Orders' = DISTINCTCOUNT(Data_pizza[order_id])
+		formatString: #,0
+		displayFolder: 01 Core KPIs
+		lineageTag: a2222222-2222-4222-a222-222222222222
+
+	measure 'Total Quantity' = SUM(Data_pizza[quantity])
+		formatString: #,0
+		displayFolder: 01 Core KPIs
+		lineageTag: a3333333-3333-4333-a333-333333333333
+
+	measure 'Average Order Value' = DIVIDE([Total Revenue], [Total Orders])
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		displayFolder: 01 Core KPIs
+		lineageTag: a4444444-4444-4444-a444-444444444444
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	measure 'Rank Pizza by Revenue' = RANKX(ALL(Data_pizza[name]), [Total Revenue], , DESC, Dense)
+		formatString: 0
+		displayFolder: 04 Menu Performance
+		lineageTag: a5555555-5555-4555-a555-555555555555
+
+	measure 'Peak Hour Revenue' = MAXX(VALUES(Dim_Time[Order Hour]), [Total Revenue])
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		displayFolder: 02 Temporal
+		lineageTag: a6666666-6666-4666-a666-666666666666
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	measure 'Weekend Revenue' = CALCULATE([Total Revenue], Dim_Date[WeekdayNo] IN {6,7})
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		displayFolder: 02 Temporal
+		lineageTag: a7777777-7777-4777-a777-777777777777
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	measure 'Weekday Revenue' = CALCULATE([Total Revenue], Dim_Date[WeekdayNo] IN {1,2,3,4,5})
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		displayFolder: 02 Temporal
+		lineageTag: a8888888-8888-4888-a888-888888888888
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	measure 'Avg Basket Size' = DIVIDE([Total Quantity], [Total Orders])
+		formatString: 0.00
+		displayFolder: 01 Core KPIs
+		lineageTag: a9999999-9999-4999-a999-999999999999
+
+	measure 'Multi-Item Order %' =
+			DIVIDE(
+			    CALCULATE(DISTINCTCOUNT(Data_pizza[order_id]), Data_pizza[Order Type] = "Multi-Item"),
+			    [Total Orders]
+			)
+		formatString: 0.0%;-0.0%;0.0%
+		displayFolder: 03 Order Behavior
+		lineageTag: b1111111-1111-4111-b111-111111111111
+
+	measure 'Top 5 Revenue Share' =
+			VAR _Top5 = TOPN(5, VALUES(Data_pizza[name]), [Total Revenue], DESC)
+			VAR _Top5Rev = CALCULATE([Total Revenue], _Top5)
+			RETURN DIVIDE(_Top5Rev, CALCULATE([Total Revenue], ALL(Data_pizza[name])))
+		formatString: 0.0%;-0.0%;0.0%
+		displayFolder: 04 Menu Performance
+		lineageTag: b2222222-2222-4222-b222-222222222222
+
+	measure 'Revenue Growth MoM %' =
+			VAR _Curr = [Total Revenue]
+			VAR _Prev = CALCULATE([Total Revenue], DATEADD(Dim_Date[Date], -1, MONTH))
+			RETURN IF(ISBLANK(_Prev) || _Prev = 0, BLANK(), DIVIDE(_Curr - _Prev, _Prev))
+		formatString: 0.0%;-0.0%;"n/a"
+		displayFolder: 02 Temporal
+		lineageTag: b3333333-3333-4333-b333-333333333333
+
+	measure 'Latest Month MoM %' =
+			VAR _LatestDate = MAX(Data_pizza[date])
+			VAR _LatestYM =
+			    CALCULATE(
+			        MAX(Dim_Date[YearMonthKey]),
+			        Dim_Date[Date] = _LatestDate
+			    )
+			VAR _CurrRev =
+			    CALCULATE(
+			        [Total Revenue],
+			        ALL(Dim_Date),
+			        Dim_Date[YearMonthKey] = _LatestYM
+			    )
+			VAR _PrevRev =
+			    CALCULATE(
+			        [Total Revenue],
+			        ALL(Dim_Date),
+			        Dim_Date[YearMonthKey] = _LatestYM - 1
+			    )
+			RETURN IF(ISBLANK(_PrevRev) || _PrevRev = 0, BLANK(), DIVIDE(_CurrRev - _PrevRev, _PrevRev))
+		formatString: 0.0%;-0.0%;"n/a"
+		displayFolder: 02 Temporal
+		lineageTag: d1111111-1111-4111-d111-111111111111
+
+	measure 'Revenue YoY %' =
+			VAR _Curr = [Total Revenue]
+			VAR _Prev = CALCULATE([Total Revenue], SAMEPERIODLASTYEAR(Dim_Date[Date]))
+			RETURN IF(ISBLANK(_Prev) || _Prev = 0, BLANK(), DIVIDE(_Curr - _Prev, _Prev))
+		formatString: 0.0%;-0.0%;"n/a"
+		displayFolder: 02 Temporal
+		lineageTag: c1111111-1111-4111-c111-111111111111
+
+	measure 'Revenue 7D Moving Avg' =
+			VAR _Range = DATESINPERIOD(Dim_Date[Date], MAX(Dim_Date[Date]), -7, DAY)
+			RETURN DIVIDE(CALCULATE([Total Revenue], _Range), 7)
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		displayFolder: 02 Temporal
+		lineageTag: c2222222-2222-4222-c222-222222222222
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	measure 'Best Selling Size' =
+			VAR _TopSize =
+			    TOPN(
+			        1,
+			        ADDCOLUMNS(
+			            VALUES(Data_pizza[size]),
+			            "@qty", CALCULATE([Total Quantity])
+			        ),
+			        [@qty], DESC
+			    )
+			RETURN CONCATENATEX(_TopSize, Data_pizza[size], ", ")
+		displayFolder: 04 Menu Performance
+		lineageTag: c3333333-3333-4333-c333-333333333333
+
+	measure 'Category Concentration HHI' =
+			VAR _Shares =
+			    ADDCOLUMNS(
+			        VALUES(Data_pizza[category]),
+			        "@share",
+			            DIVIDE(
+			                CALCULATE([Total Revenue]),
+			                CALCULATE([Total Revenue], ALL(Data_pizza[category]))
+			            )
+			    )
+			RETURN SUMX(_Shares, [@share] * [@share])
+		formatString: 0.000
+		displayFolder: 04 Menu Performance
+		lineageTag: c4444444-4444-4444-c444-444444444444
+
+	measure 'Avg Pizza Price' = AVERAGE(Data_pizza[price])
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		displayFolder: 01 Core KPIs
+		lineageTag: c5555555-5555-4555-c555-555555555555
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	measure 'Correlation Coefficient' =
+			VAR _T =
+			    ADDCOLUMNS(
+			        VALUES(Data_pizza[category]),
+			        "@X", CALCULATE([Avg Pizza Price]),
+			        "@Y", CALCULATE([Total Quantity])
+			    )
+			VAR _AvgX = AVERAGEX(_T, [@X])
+			VAR _AvgY = AVERAGEX(_T, [@Y])
+			VAR _Num  = SUMX(_T, ([@X] - _AvgX) * ([@Y] - _AvgY))
+			VAR _DenX = SQRT(SUMX(_T, ([@X] - _AvgX) ^ 2))
+			VAR _DenY = SQRT(SUMX(_T, ([@Y] - _AvgY) ^ 2))
+			RETURN DIVIDE(_Num, _DenX * _DenY)
+		formatString: 0.00
+		displayFolder: 04 Menu Performance
+		lineageTag: c6666666-6666-4666-c666-666666666666
+
+	measure 'Median Pizza Price' = MEDIANX(VALUES(Data_pizza[name]), CALCULATE([Avg Pizza Price]))
+		formatString: \$#,0.00
+		displayFolder: 04 Menu Performance
+		lineageTag: c7777777-7777-4777-c777-777777777777
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	measure 'Median Pizza Volume' = MEDIANX(VALUES(Data_pizza[name]), CALCULATE([Total Quantity]))
+		formatString: #,0
+		displayFolder: 04 Menu Performance
+		lineageTag: c8888888-8888-4888-c888-888888888888
+
+	measure 'Revenue WoW %' =
+			VAR _Curr = [Total Revenue]
+			VAR _Prev = CALCULATE([Total Revenue], DATEADD(Dim_Date[Date], -7, DAY))
+			RETURN IF(ISBLANK(_Prev) || _Prev = 0, BLANK(), DIVIDE(_Curr - _Prev, _Prev))
+		formatString: 0.0%;-0.0%;"n/a"
+		displayFolder: 02 Temporal
+		lineageTag: fec2c44f-3929-42ae-bd7d-70d8b2234283
+
+	measure 'Revenue MTD' = CALCULATE([Total Revenue], DATESMTD(Dim_Date[Date]))
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		displayFolder: 02 Temporal
+		lineageTag: ba303f8c-fe6c-4bd2-8796-7b8354d9aa80
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	measure 'Revenue MTD Prior' =
+			VAR _LatestDate = MAX(Dim_Date[Date])
+			VAR _DayOfMonth = DAY(_LatestDate)
+			VAR _PrevMonthEnd = EOMONTH(_LatestDate, -1)
+			VAR _PrevStart = DATE(YEAR(_PrevMonthEnd), MONTH(_PrevMonthEnd), 1)
+			VAR _PrevCutoff = DATE(YEAR(_PrevMonthEnd), MONTH(_PrevMonthEnd), MIN(_DayOfMonth, DAY(_PrevMonthEnd)))
+			RETURN
+			    CALCULATE(
+			        [Total Revenue],
+			        DATESBETWEEN(Dim_Date[Date], _PrevStart, _PrevCutoff)
+			    )
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		displayFolder: 02 Temporal
+		lineageTag: 28e2f200-465a-4d8a-bd21-439502ba6b67
+
+		annotation PBI_FormatHint = {"isCustom":true}
+
+	measure 'Revenue Pacing %' =
+			VAR _Curr = [Revenue MTD]
+			VAR _Prev = [Revenue MTD Prior]
+			RETURN IF(ISBLANK(_Prev) || _Prev = 0, BLANK(), DIVIDE(_Curr - _Prev, _Prev))
+		formatString: 0.0%;-0.0%;"n/a"
+		displayFolder: 02 Temporal
+		lineageTag: ba5345d6-b3ba-4c32-8074-245e40caaedb
+
+	measure 'SKU Share of Revenue' =
+			DIVIDE(
+			    [Total Revenue],
+			    CALCULATE([Total Revenue], ALL(Data_pizza[name]))
+			)
+		formatString: 0.0%;-0.0%;0.0%
+		displayFolder: 04 Menu Performance
+		lineageTag: bf7e4eb6-bf8a-4788-9e83-301d046fce68
+
+	measure 'SKU Rank Prior Month' =
+			RANKX(
+			    ALL(Data_pizza[name]),
+			    CALCULATE([Total Revenue], DATEADD(Dim_Date[Date], -1, MONTH)),
+			    ,
+			    DESC,
+			    Dense
+			)
+		formatString: 0
+		displayFolder: 04 Menu Performance
+		lineageTag: f17457f1-489e-4ac1-9a09-e8c8864b6a09
+
+	measure 'SKU Rank Delta' =
+			VAR _Curr = [Rank Pizza by Revenue]
+			VAR _Prev = [SKU Rank Prior Month]
+			RETURN IF(ISBLANK(_Curr) || ISBLANK(_Prev), BLANK(), _Prev - _Curr)
+		formatString: +0;-0;0
+		displayFolder: 04 Menu Performance
+		lineageTag: 1ac55baf-1e53-498c-8415-286bf7080af9
+
+	measure 'Active Filter Text' =
+			VAR _Cat = SELECTEDVALUE(Data_pizza[category], "All categories")
+			VAR _Size = SELECTEDVALUE(Data_pizza[size], "All sizes")
+			VAR _MinDate = MIN(Dim_Date[Date])
+			VAR _MaxDate = MAX(Dim_Date[Date])
+			VAR _Range = FORMAT(_MinDate, "mmm yyyy") & " to " & FORMAT(_MaxDate, "mmm yyyy")
+			RETURN _Cat & ", " & _Size & ", " & _Range
+		displayFolder: 05 Context
+		lineageTag: 5e1226bc-9c2d-4929-9413-a80632666538
+
+	measure 'Data Freshness' = "Data through " & FORMAT(MAX(Dim_Date[Date]), "d mmm yyyy")
+		displayFolder: 05 Context
+		lineageTag: f444b10a-0968-40f0-9311-1b5bd2c071e9
+
+	measure 'Orders YoY %' =
+			VAR _Curr = [Total Orders]
+			VAR _Prev = CALCULATE([Total Orders], SAMEPERIODLASTYEAR(Dim_Date[Date]))
+			RETURN IF(ISBLANK(_Prev) || _Prev = 0, BLANK(), DIVIDE(_Curr - _Prev, _Prev))
+		formatString: 0.0%;-0.0%;"n/a"
+		displayFolder: 02 Temporal
+		lineageTag: 55650173-ae23-4a24-a150-b79b1f82d24f
+
+	measure 'Quantity YoY %' =
+			VAR _Curr = [Total Quantity]
+			VAR _Prev = CALCULATE([Total Quantity], SAMEPERIODLASTYEAR(Dim_Date[Date]))
+			RETURN IF(ISBLANK(_Prev) || _Prev = 0, BLANK(), DIVIDE(_Curr - _Prev, _Prev))
+		formatString: 0.0%;-0.0%;"n/a"
+		displayFolder: 02 Temporal
+		lineageTag: 3955afd7-558a-4fd0-bee2-c09c0dce5d40
+
+	measure 'AOV YoY %' =
+			VAR _Curr = [Average Order Value]
+			VAR _Prev = CALCULATE([Average Order Value], SAMEPERIODLASTYEAR(Dim_Date[Date]))
+			RETURN IF(ISBLANK(_Prev) || _Prev = 0, BLANK(), DIVIDE(_Curr - _Prev, _Prev))
+		formatString: 0.0%;-0.0%;"n/a"
+		displayFolder: 02 Temporal
+		lineageTag: 295b3afb-fc85-45c4-8afc-f764d98447e5
+
+	measure 'Peak Hour Revenue YoY %' =
+			VAR _Curr = [Peak Hour Revenue]
+			VAR _Prev = CALCULATE([Peak Hour Revenue], SAMEPERIODLASTYEAR(Dim_Date[Date]))
+			RETURN IF(ISBLANK(_Prev) || _Prev = 0, BLANK(), DIVIDE(_Curr - _Prev, _Prev))
+		formatString: 0.0%;-0.0%;"n/a"
+		displayFolder: 02 Temporal
+		lineageTag: d37a6571-4d78-4653-be6f-aefd5d087094
+
+	measure 'Weekend Revenue YoY %' =
+			VAR _Curr = [Weekend Revenue]
+			VAR _Prev = CALCULATE([Weekend Revenue], SAMEPERIODLASTYEAR(Dim_Date[Date]))
+			RETURN IF(ISBLANK(_Prev) || _Prev = 0, BLANK(), DIVIDE(_Curr - _Prev, _Prev))
+		formatString: 0.0%;-0.0%;"n/a"
+		displayFolder: 02 Temporal
+		lineageTag: 3391e18e-01c5-4af9-bbaa-c3d5315bd14f
+
+	measure 'Weekday Revenue YoY %' =
+			VAR _Curr = [Weekday Revenue]
+			VAR _Prev = CALCULATE([Weekday Revenue], SAMEPERIODLASTYEAR(Dim_Date[Date]))
+			RETURN IF(ISBLANK(_Prev) || _Prev = 0, BLANK(), DIVIDE(_Curr - _Prev, _Prev))
+		formatString: 0.0%;-0.0%;"n/a"
+		displayFolder: 02 Temporal
+		lineageTag: c9c823e9-1b30-4b12-b286-1cb956a4343c
+
+	measure 'SKU Best Pair' =
+			VAR _Current = SELECTEDVALUE(Data_pizza[name])
+			VAR _Orders = CALCULATETABLE(VALUES(Data_pizza[order_id]), Data_pizza[name] = _Current)
+			VAR _Partners =
+				CALCULATETABLE(
+					SUMMARIZE(Data_pizza, Data_pizza[name], "_c", DISTINCTCOUNT(Data_pizza[order_id])),
+					TREATAS(_Orders, Data_pizza[order_id]),
+					Data_pizza[name] <> _Current
+				)
+			VAR _Top = TOPN(1, _Partners, [_c], DESC)
+			RETURN IF(ISBLANK(_Current), BLANK(), CONCATENATEX(_Top, Data_pizza[name], ", "))
+			lineageTag: 4d122deb-5044-443a-8b4e-aa36a631ce19
+			displayFolder: 06 Tooltip
+		lineageTag: 7c7e3537-ead4-4b33-ba27-d5f80e14ec62
+
+	measure 'SKU Peak Hour' =
+			VAR _Current = SELECTEDVALUE(Data_pizza[name])
+			VAR _Hours = ADDCOLUMNS(VALUES(Dim_Time[Order Hour]), "_r", CALCULATE([Total Revenue]))
+			VAR _Top = TOPN(1, _Hours, [_r], DESC)
+			RETURN
+				IF(
+					ISBLANK(_Current),
+					BLANK(),
+					CONCATENATEX(_Top, FORMAT(TIME(Dim_Time[Order Hour], 0, 0), "h AM/PM"), ", ")
+				)
+			lineageTag: 3dfe0d1e-0d74-44b6-a61f-a83a5ea68d53
+			displayFolder: 06 Tooltip
+		lineageTag: 80c9beb2-b8b7-423c-a26e-571e2464a246
+
+	measure 'SKU Top Size' =
+			VAR _Current = SELECTEDVALUE(Data_pizza[name])
+			VAR _Sizes = ADDCOLUMNS(VALUES(Data_pizza[size]), "_q", CALCULATE(SUM(Data_pizza[quantity])))
+			VAR _Top = TOPN(1, _Sizes, [_q], DESC)
+			RETURN IF(ISBLANK(_Current), BLANK(), CONCATENATEX(_Top, Data_pizza[size], ", "))
+			lineageTag: 33b30702-0f4e-488d-9c25-b68d42222046
+			displayFolder: 06 Tooltip
+		lineageTag: d1a884f6-93af-4e33-b703-301e8be6ac92
+
+	measure 'Cell Top SKU' =
+			VAR _Pizzas = ADDCOLUMNS(VALUES(Data_pizza[name]), "_r", CALCULATE([Total Revenue]))
+			VAR _Top = TOPN(1, _Pizzas, [_r], DESC)
+			RETURN CONCATENATEX(_Top, Data_pizza[name], ", ")
+			lineageTag: e3dc4cf8-6080-4bcb-b154-1c87b41c562a
+			displayFolder: 06 Tooltip
+		lineageTag: 3c33a3be-fed6-43f0-8a60-14421c8d693f
+
+	measure 'Cell vs Weekday Avg %' =
+			VAR _Curr = [Total Revenue]
+			VAR _WkdAvg =
+				CALCULATE(
+					AVERAGEX(VALUES(Dim_Time[Order Hour]), [Total Revenue]),
+					ALL(Dim_Time[Order Hour])
+				)
+			RETURN DIVIDE(_Curr - _WkdAvg, _WkdAvg)
+			formatString: +0.0%;-0.0%;0%
+			lineageTag: 2c3e8e4e-673b-451b-8542-99ae6b68dfe9
+			displayFolder: 06 Tooltip
+		lineageTag: 82142d67-63cc-4e2e-af9b-a697e4402e22
+
+	measure 'Hour Busiest Weekday' =
+			VAR _Days = ADDCOLUMNS(VALUES(Dim_Date[WeekdayName]), "_r", CALCULATE([Total Revenue]))
+			VAR _Top = TOPN(1, _Days, [_r], DESC)
+			RETURN CONCATENATEX(_Top, Dim_Date[WeekdayName], ", ")
+			lineageTag: fd260112-e5eb-4b5e-9681-f40adc379d9d
+			displayFolder: 06 Tooltip
+		lineageTag: 86b9d15c-e614-4c02-ab6a-ad22d715788a
+
+	measure 'Hour Share of Day %' =
+			DIVIDE([Total Revenue], CALCULATE([Total Revenue], ALL(Dim_Time[Order Hour])))
+			formatString: 0.0%;-0.0%;0%
+			lineageTag: 48642aed-c8cb-4fa3-9af5-7c3776a2d52e
+			displayFolder: 06 Tooltip
+		lineageTag: 5b543208-7e53-4371-8a75-3f13c05bb417
+
+	column Placeholder
+		lineageTag: fa8801d5-563a-4790-b742-4aa17ddcd307
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Placeholder]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition measurements = calculated
+		mode: import
+		source = ROW("Placeholder", "Use for measures only")
+
+	annotation PBI_Id = a5724ae0d2e64168bc8a66b4ca558467
+

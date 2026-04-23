@@ -1,0 +1,76 @@
+table 'daily revenue'
+	lineageTag: 663c8860-1d95-4754-b7e3-f05a05360801
+
+	measure 'Top and Bottom 5' = ```
+			
+			VAR TotalRev = SUM('daily revenue'[Daily Revenue])
+			VAR RankTop = RANKX(ALLSELECTED('daily revenue'[Date]), [Total Revenue], , DESC)
+			VAR RankBottom = RANKX(ALLSELECTED('daily revenue'[Date]), [Total Revenue], , ASC)
+			
+			RETURN
+			IF(
+			    RankTop <= 5 || RankBottom <= 5,
+			    TotalRev,
+			    BLANK()
+			)
+			
+			```
+		lineageTag: d15d7bc9-8658-449b-add3-860e0ef6c1ff
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: a182eee3-8a91-4130-9ea4-ea08e12d4155
+		summarizeBy: none
+		sourceColumn: date
+
+		variation Variation
+			isDefault
+			relationship: 6527e6a0-3042-4e34-b027-15ee71acdb54
+			defaultHierarchy: LocalDateTable_c2a39ff7-3de9-40d4-803a-bd18b7ee9de4.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Daily Revenue'
+		dataType: double
+		lineageTag: f48d9cc7-7066-4459-84cf-1ae7ad2a84ea
+		summarizeBy: sum
+		sourceColumn: Daily Revenue
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Revenue rank'
+		dataType: int64
+		formatString: 0
+		lineageTag: a350a5ce-eadd-4eb4-8668-f7791e2bd49e
+		summarizeBy: sum
+		sourceColumn: Revenue rank
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'daily revenue' = m
+		mode: import
+		source =
+				let
+				    Source = Data_pizza,
+				    #"Added Custom" = Table.AddColumn(Source, "Custom", each [date]&[time]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Added Custom",{{"Custom", type datetime}}),
+				    #"Renamed Columns" = Table.RenameColumns(#"Changed Type",{{"Custom", "Datetime"}}),
+				    #"Added Custom1" = Table.AddColumn(#"Renamed Columns", "Revenue", each [quantity]*[price]),
+				    #"Grouped Rows" = Table.Group(#"Added Custom1", {"date"}, {{"Daily Revenue", each List.Sum([Revenue]), type number}}),
+				    #"Sorted Rows" = Table.Sort(#"Grouped Rows",{{"Daily Revenue", Order.Ascending}}),
+				    #"Added Index" = Table.AddIndexColumn(#"Sorted Rows", "Index", 1, 1, Int64.Type),
+				    #"Renamed Columns1" = Table.RenameColumns(#"Added Index",{{"Index", "Revenue rank"}})
+				in
+				    #"Renamed Columns1"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

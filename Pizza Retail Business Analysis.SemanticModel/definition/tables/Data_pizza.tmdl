@@ -1,0 +1,161 @@
+table Data_pizza
+	lineageTag: 8f89507e-aada-4cf0-a35c-a96a576248cb
+
+	column order_id
+		dataType: int64
+		formatString: 0
+		lineageTag: a85db31d-c41a-4978-b028-fc4df139fc15
+		summarizeBy: sum
+		sourceColumn: order_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: f0b9eb3c-aaf7-442b-a289-b04998bcd961
+		summarizeBy: none
+		sourceColumn: date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column time
+		dataType: dateTime
+		formatString: Long Time
+		lineageTag: 53b18f84-e6eb-4010-bb83-408d285d6c2f
+		summarizeBy: none
+		sourceColumn: time
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Time
+
+	column pizza_id
+		dataType: string
+		lineageTag: a3017b7b-3ea3-4c18-8ad7-5a47b69a75e1
+		summarizeBy: none
+		sourceColumn: pizza_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column quantity
+		dataType: int64
+		formatString: 0
+		lineageTag: 0527a5ad-ab86-4901-b64b-0068c0ea38c8
+		summarizeBy: sum
+		sourceColumn: quantity
+
+		annotation SummarizationSetBy = Automatic
+
+	column size
+		dataType: string
+		lineageTag: e9f9d74c-6620-4ea6-accb-746044782eb4
+		summarizeBy: none
+		sourceColumn: size
+
+		annotation SummarizationSetBy = Automatic
+
+	column price
+		dataType: double
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		lineageTag: 11be061e-89ea-49cb-857e-8244a7ea9fca
+		summarizeBy: sum
+		sourceColumn: price
+
+		annotation SummarizationSetBy = Automatic
+
+	column name
+		dataType: string
+		lineageTag: f84c192f-5653-4894-b08b-985daa2763ed
+		summarizeBy: none
+		sourceColumn: name
+
+		annotation SummarizationSetBy = Automatic
+
+	column category
+		dataType: string
+		lineageTag: 1ef34834-4363-4aa7-950e-7a9dd0167cd0
+		summarizeBy: none
+		sourceColumn: category
+
+		annotation SummarizationSetBy = Automatic
+
+	column Revenue = ```
+			
+			    Data_pizza[quantity] * Data_pizza[price]
+			
+			```
+		lineageTag: a59baf86-50c6-4de8-9112-4f3f2df3fe67
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Daily Revenue' =
+			
+			CALCULATE(
+			    SUMX(Data_pizza, Data_pizza[quantity] * Data_pizza[price]),
+			    ALLEXCEPT(Data_pizza, Data_pizza[date])
+			)
+		lineageTag: c5e88f97-9182-40aa-aba0-32a46451f926
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column DateTime =
+			
+			Data_pizza[date] + TIME(
+			    HOUR(Data_pizza[time]),
+			    MINUTE(Data_pizza[time]),
+			    SECOND(Data_pizza[time])
+			)
+		formatString: General Date
+		lineageTag: abc55654-20ce-4710-bf5f-1e0bcba53d63
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column ingredients
+		dataType: string
+		lineageTag: aed0ef9c-ee6a-41fc-9103-d50034cfe5e5
+		summarizeBy: none
+		sourceColumn: ingredients
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Order Type' =
+			VAR CurrentOrder = Data_pizza[order_id]
+			VAR UniqueItems = CALCULATE(
+			    DISTINCTCOUNT(Data_pizza[name]),
+			    ALL(Data_pizza),
+			    Data_pizza[order_id] = CurrentOrder
+			)
+			RETURN IF(UniqueItems > 1, "Multi-Item", "Single-Item")
+		lineageTag: 388670b7-5701-4e05-b272-74593730e7f9
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Data_pizza = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents("D:\Download\data_pizza.xlsx"), null, true),
+				    Sheet1_Sheet = Source{[Item="Sheet1",Kind="Sheet"]}[Data],
+				    #"Promoted Headers" = Table.PromoteHeaders(Sheet1_Sheet, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"order_id", Int64.Type}, {"date", type date}, {"time", type datetime}, {"pizza_id", type text}, {"quantity", Int64.Type}, {"size", type text}, {"price", type number}, {"name", type text}, {"category", type text}, {"ingredients", type text}}),
+				    #"Sorted Rows" = Table.Sort(#"Changed Type",{{"date", Order.Ascending}}),
+				    #"Changed Type1" = Table.TransformColumnTypes(#"Sorted Rows",{{"date", type date}, {"time", type time}}),
+				    #"Sorted Rows1" = Table.Sort(#"Changed Type1",{{"pizza_id", Order.Ascending}})
+				in
+				    #"Sorted Rows1"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+
