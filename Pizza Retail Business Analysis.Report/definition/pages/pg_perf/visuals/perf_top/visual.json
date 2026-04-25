@@ -20,13 +20,13 @@
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "Data_pizza"
+                      "Entity": "dim_pizza"
                     }
                   },
                   "Property": "name"
                 }
               },
-              "queryRef": "Data_pizza.name",
+              "queryRef": "dim_pizza.name",
               "nativeQueryRef": "name",
               "active": true
             }
@@ -39,14 +39,14 @@
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "Data_pizza"
+                      "Entity": "dim_pizza"
                     }
                   },
-                  "Property": "category"
+                  "Property": "Pizza Category"
                 }
               },
-              "queryRef": "Data_pizza.category",
-              "nativeQueryRef": "category",
+              "queryRef": "dim_pizza.Pizza Category",
+              "nativeQueryRef": "Pizza Category",
               "active": true
             }
           ]
@@ -330,10 +330,10 @@
                       "Column": {
                         "Expression": {
                           "SourceRef": {
-                            "Entity": "Data_pizza"
+                            "Entity": "dim_pizza"
                           }
                         },
-                        "Property": "category"
+                        "Property": "Pizza Category"
                       }
                     },
                     "Right": {
@@ -371,10 +371,10 @@
                       "Column": {
                         "Expression": {
                           "SourceRef": {
-                            "Entity": "Data_pizza"
+                            "Entity": "dim_pizza"
                           }
                         },
-                        "Property": "category"
+                        "Property": "Pizza Category"
                       }
                     },
                     "Right": {
@@ -412,10 +412,10 @@
                       "Column": {
                         "Expression": {
                           "SourceRef": {
-                            "Entity": "Data_pizza"
+                            "Entity": "dim_pizza"
                           }
                         },
-                        "Property": "category"
+                        "Property": "Pizza Category"
                       }
                     },
                     "Right": {
@@ -453,10 +453,10 @@
                       "Column": {
                         "Expression": {
                           "SourceRef": {
-                            "Entity": "Data_pizza"
+                            "Entity": "dim_pizza"
                           }
                         },
-                        "Property": "category"
+                        "Property": "Pizza Category"
                       }
                     },
                     "Right": {
@@ -602,7 +602,7 @@
           "Column": {
             "Expression": {
               "SourceRef": {
-                "Entity": "Data_pizza"
+                "Entity": "dim_pizza"
               }
             },
             "Property": "name"
@@ -621,7 +621,7 @@
                     "From": [
                       {
                         "Name": "d",
-                        "Entity": "Data_pizza",
+                        "Entity": "dim_pizza",
                         "Type": 0
                       },
                       {
@@ -666,7 +666,7 @@
             },
             {
               "Name": "d",
-              "Entity": "Data_pizza",
+              "Entity": "dim_pizza",
               "Type": 0
             }
           ],
@@ -717,10 +717,10 @@
           "Column": {
             "Expression": {
               "SourceRef": {
-                "Entity": "Data_pizza"
+                "Entity": "dim_pizza"
               }
             },
-            "Property": "category"
+            "Property": "Pizza Category"
           }
         },
         "type": "Categorical"

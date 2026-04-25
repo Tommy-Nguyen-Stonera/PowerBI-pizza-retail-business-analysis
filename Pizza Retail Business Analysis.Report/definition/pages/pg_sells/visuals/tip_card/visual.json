@@ -3,10 +3,10 @@
   "name": "tip_card",
   "position": {
     "x": 1048,
-    "y": 344,
+    "y": 368,
     "z": 18000,
-    "height": 96,
-    "width": 200,
+    "height": 72,
+    "width": 216,
     "tabOrder": 14000
   },
   "visual": {

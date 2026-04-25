@@ -2,7 +2,7 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.8.0/schema.json",
   "name": "sell_corr_r",
   "position": {
-    "x": 904,
+    "x": 896,
     "y": 160,
     "z": 20000,
     "height": 88,

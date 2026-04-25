@@ -25,7 +25,7 @@ table measurements
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	measure 'Rank Pizza by Revenue' = RANKX(ALL(Data_pizza[name]), [Total Revenue], , DESC, Dense)
+	measure 'Rank Pizza by Revenue' = RANKX(ALL(dim_pizza[name]), [Total Revenue], , DESC, Dense)
 		formatString: 0
 		displayFolder: 04 Menu Performance
 		lineageTag: a5555555-5555-4555-a555-555555555555
@@ -66,9 +66,9 @@ table measurements
 		lineageTag: b1111111-1111-4111-b111-111111111111
 
 	measure 'Top 5 Revenue Share' =
-			VAR _Top5 = TOPN(5, VALUES(Data_pizza[name]), [Total Revenue], DESC)
+			VAR _Top5 = TOPN(5, VALUES(dim_pizza[name]), [Total Revenue], DESC)
 			VAR _Top5Rev = CALCULATE([Total Revenue], _Top5)
-			RETURN DIVIDE(_Top5Rev, CALCULATE([Total Revenue], ALL(Data_pizza[name])))
+			RETURN DIVIDE(_Top5Rev, CALCULATE([Total Revenue], ALL(dim_pizza[name])))
 		formatString: 0.0%;-0.0%;0.0%
 		displayFolder: 04 Menu Performance
 		lineageTag: b2222222-2222-4222-b222-222222222222
@@ -127,23 +127,23 @@ table measurements
 			    TOPN(
 			        1,
 			        ADDCOLUMNS(
-			            VALUES(Data_pizza[size]),
+			            VALUES(dim_size[pizza_size]),
 			            "@qty", CALCULATE([Total Quantity])
 			        ),
 			        [@qty], DESC
 			    )
-			RETURN CONCATENATEX(_TopSize, Data_pizza[size], ", ")
+			RETURN CONCATENATEX(_TopSize, dim_size[pizza_size], ", ")
 		displayFolder: 04 Menu Performance
 		lineageTag: c3333333-3333-4333-c333-333333333333
 
 	measure 'Category Concentration HHI' =
 			VAR _Shares =
 			    ADDCOLUMNS(
-			        VALUES(Data_pizza[category]),
+			        VALUES(dim_pizza[Pizza Category]),
 			        "@share",
 			            DIVIDE(
 			                CALCULATE([Total Revenue]),
-			                CALCULATE([Total Revenue], ALL(Data_pizza[category]))
+			                CALCULATE([Total Revenue], ALL(dim_pizza[Pizza Category]))
 			            )
 			    )
 			RETURN SUMX(_Shares, [@share] * [@share])
@@ -161,7 +161,7 @@ table measurements
 	measure 'Correlation Coefficient' =
 			VAR _T =
 			    ADDCOLUMNS(
-			        VALUES(Data_pizza[category]),
+			        VALUES(dim_pizza[Pizza Category]),
 			        "@X", CALCULATE([Avg Pizza Price]),
 			        "@Y", CALCULATE([Total Quantity])
 			    )
@@ -175,14 +175,14 @@ table measurements
 		displayFolder: 04 Menu Performance
 		lineageTag: c6666666-6666-4666-c666-666666666666
 
-	measure 'Median Pizza Price' = MEDIANX(VALUES(Data_pizza[name]), CALCULATE([Avg Pizza Price]))
+	measure 'Median Pizza Price' = MEDIANX(VALUES(dim_pizza[name]), CALCULATE([Avg Pizza Price]))
 		formatString: \$#,0.00
 		displayFolder: 04 Menu Performance
 		lineageTag: c7777777-7777-4777-c777-777777777777
 
 		annotation PBI_FormatHint = {"isCustom":true}
 
-	measure 'Median Pizza Volume' = MEDIANX(VALUES(Data_pizza[name]), CALCULATE([Total Quantity]))
+	measure 'Median Pizza Volume' = MEDIANX(VALUES(dim_pizza[name]), CALCULATE([Total Quantity]))
 		formatString: #,0
 		displayFolder: 04 Menu Performance
 		lineageTag: c8888888-8888-4888-c888-888888888888
@@ -230,7 +230,7 @@ table measurements
 	measure 'SKU Share of Revenue' =
 			DIVIDE(
 			    [Total Revenue],
-			    CALCULATE([Total Revenue], ALL(Data_pizza[name]))
+			    CALCULATE([Total Revenue], ALL(dim_pizza[name]))
 			)
 		formatString: 0.0%;-0.0%;0.0%
 		displayFolder: 04 Menu Performance
@@ -238,7 +238,7 @@ table measurements
 
 	measure 'SKU Rank Prior Month' =
 			RANKX(
-			    ALL(Data_pizza[name]),
+			    ALL(dim_pizza[name]),
 			    CALCULATE([Total Revenue], DATEADD(Dim_Date[Date], -1, MONTH)),
 			    ,
 			    DESC,
@@ -257,8 +257,8 @@ table measurements
 		lineageTag: 1ac55baf-1e53-498c-8415-286bf7080af9
 
 	measure 'Active Filter Text' =
-			VAR _Cat = SELECTEDVALUE(Data_pizza[category], "All categories")
-			VAR _Size = SELECTEDVALUE(Data_pizza[size], "All sizes")
+			VAR _Cat = SELECTEDVALUE(dim_pizza[Pizza Category], "All categories")
+			VAR _Size = SELECTEDVALUE(dim_size[pizza_size], "All sizes")
 			VAR _MinDate = MIN(Dim_Date[Date])
 			VAR _MaxDate = MAX(Dim_Date[Date])
 			VAR _Range = FORMAT(_MinDate, "mmm yyyy") & " to " & FORMAT(_MaxDate, "mmm yyyy")
@@ -319,22 +319,22 @@ table measurements
 		lineageTag: c9c823e9-1b30-4b12-b286-1cb956a4343c
 
 	measure 'SKU Best Pair' =
-			VAR _Current = SELECTEDVALUE(Data_pizza[name])
-			VAR _Orders = CALCULATETABLE(VALUES(Data_pizza[order_id]), Data_pizza[name] = _Current)
+			VAR _Current = SELECTEDVALUE(dim_pizza[name])
+			VAR _Orders = CALCULATETABLE(VALUES(Data_pizza[order_id]), dim_pizza[name] = _Current)
 			VAR _Partners =
 				CALCULATETABLE(
-					SUMMARIZE(Data_pizza, Data_pizza[name], "_c", DISTINCTCOUNT(Data_pizza[order_id])),
+					SUMMARIZE(Data_pizza, dim_pizza[name], "_c", DISTINCTCOUNT(Data_pizza[order_id])),
 					TREATAS(_Orders, Data_pizza[order_id]),
-					Data_pizza[name] <> _Current
+					dim_pizza[name] <> _Current
 				)
 			VAR _Top = TOPN(1, _Partners, [_c], DESC)
-			RETURN IF(ISBLANK(_Current), BLANK(), CONCATENATEX(_Top, Data_pizza[name], ", "))
+			RETURN IF(ISBLANK(_Current), BLANK(), CONCATENATEX(_Top, dim_pizza[name], ", "))
 			lineageTag: 4d122deb-5044-443a-8b4e-aa36a631ce19
 			displayFolder: 06 Tooltip
 		lineageTag: 7c7e3537-ead4-4b33-ba27-d5f80e14ec62
 
 	measure 'SKU Peak Hour' =
-			VAR _Current = SELECTEDVALUE(Data_pizza[name])
+			VAR _Current = SELECTEDVALUE(dim_pizza[name])
 			VAR _Hours = ADDCOLUMNS(VALUES(Dim_Time[Order Hour]), "_r", CALCULATE([Total Revenue]))
 			VAR _Top = TOPN(1, _Hours, [_r], DESC)
 			RETURN
@@ -348,18 +348,18 @@ table measurements
 		lineageTag: 80c9beb2-b8b7-423c-a26e-571e2464a246
 
 	measure 'SKU Top Size' =
-			VAR _Current = SELECTEDVALUE(Data_pizza[name])
-			VAR _Sizes = ADDCOLUMNS(VALUES(Data_pizza[size]), "_q", CALCULATE(SUM(Data_pizza[quantity])))
+			VAR _Current = SELECTEDVALUE(dim_pizza[name])
+			VAR _Sizes = ADDCOLUMNS(VALUES(dim_size[pizza_size]), "_q", CALCULATE(SUM(Data_pizza[quantity])))
 			VAR _Top = TOPN(1, _Sizes, [_q], DESC)
-			RETURN IF(ISBLANK(_Current), BLANK(), CONCATENATEX(_Top, Data_pizza[size], ", "))
+			RETURN IF(ISBLANK(_Current), BLANK(), CONCATENATEX(_Top, dim_size[pizza_size], ", "))
 			lineageTag: 33b30702-0f4e-488d-9c25-b68d42222046
 			displayFolder: 06 Tooltip
 		lineageTag: d1a884f6-93af-4e33-b703-301e8be6ac92
 
 	measure 'Cell Top SKU' =
-			VAR _Pizzas = ADDCOLUMNS(VALUES(Data_pizza[name]), "_r", CALCULATE([Total Revenue]))
+			VAR _Pizzas = ADDCOLUMNS(VALUES(dim_pizza[name]), "_r", CALCULATE([Total Revenue]))
 			VAR _Top = TOPN(1, _Pizzas, [_r], DESC)
-			RETURN CONCATENATEX(_Top, Data_pizza[name], ", ")
+			RETURN CONCATENATEX(_Top, dim_pizza[name], ", ")
 			lineageTag: e3dc4cf8-6080-4bcb-b154-1c87b41c562a
 			displayFolder: 06 Tooltip
 		lineageTag: 3c33a3be-fed6-43f0-8a60-14421c8d693f

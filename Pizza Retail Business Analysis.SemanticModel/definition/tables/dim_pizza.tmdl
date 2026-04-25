@@ -2,47 +2,44 @@ table dim_pizza
 	lineageTag: e33ebbfa-2e03-440d-912b-06cbc78bc4c1
 
 	column pizza_id
+		dataType: string
 		lineageTag: a419d021-0a56-47d2-a80c-5d001139fdcd
 		summarizeBy: none
-		isNameInferred
-		sourceColumn: Data_pizza[pizza_id]
+		sourceColumn: pizza_id
 
 		annotation SummarizationSetBy = Automatic
 
 	column name
+		dataType: string
 		lineageTag: 7c70b227-a7e3-4952-bb04-b702039a73e8
 		summarizeBy: none
-		isNameInferred
-		sourceColumn: Data_pizza[name]
+		sourceColumn: name
 
 		annotation SummarizationSetBy = Automatic
 
 	column 'Pizza Category'
+		dataType: string
 		lineageTag: 8df9c2c5-4a46-462a-9392-73c2c6bfa730
 		summarizeBy: none
-		sourceColumn: Data_pizza[category]
+		sourceColumn: category
 
 		annotation SummarizationSetBy = Automatic
 
-	column size
-		lineageTag: 544bb481-730c-4310-bc3a-1e31894ecd1f
-		summarizeBy: none
-		isNameInferred
-		sourceColumn: Data_pizza[size]
-
-		annotation SummarizationSetBy = Automatic
-
-	partition dim_pizza = calculated
+	partition dim_pizza = m
 		mode: import
 		source =
-				
-				SUMMARIZE(
-				    Data_pizza,
-				    Data_pizza[pizza_id],
-				    Data_pizza[name],
-				    Data_pizza[category],
-				    Data_pizza[size]
-				)
+				let
+				    Source = Excel.Workbook(File.Contents("D:\Download\data_pizza.xlsx"), null, true),
+				    Sheet1_Sheet = Source{[Item="Sheet1",Kind="Sheet"]}[Data],
+				    #"Promoted Headers" = Table.PromoteHeaders(Sheet1_Sheet, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"pizza_id", type text}, {"name", type text}, {"category", type text}}),
+				    #"Selected Columns" = Table.SelectColumns(#"Changed Type",{"pizza_id", "name", "category"}),
+				    #"Removed Duplicates" = Table.Distinct(#"Selected Columns")
+				in
+				    #"Removed Duplicates"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
 
 	annotation PBI_Id = 4b771687007047a78c877d16f857f046
-

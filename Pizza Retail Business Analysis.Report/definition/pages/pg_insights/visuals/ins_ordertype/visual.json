@@ -3,9 +3,9 @@
   "name": "ins_ordertype",
   "position": {
     "x": 1048,
-    "y": 400,
+    "y": 448,
     "z": 7000,
-    "height": 304,
+    "height": 256,
     "width": 216,
     "tabOrder": 20000
   },

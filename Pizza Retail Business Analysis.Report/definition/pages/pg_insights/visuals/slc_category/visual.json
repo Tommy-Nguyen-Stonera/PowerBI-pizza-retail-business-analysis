@@ -20,14 +20,14 @@
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "Data_pizza"
+                      "Entity": "dim_pizza"
                     }
                   },
-                  "Property": "category"
+                  "Property": "Pizza Category"
                 }
               },
-              "queryRef": "Data_pizza.category",
-              "nativeQueryRef": "category",
+              "queryRef": "dim_pizza.Pizza Category",
+              "nativeQueryRef": "Pizza Category",
               "active": true
             }
           ]
