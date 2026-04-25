@@ -1,5 +1,7 @@
-# Power BI Desktop user-local settings (machine-specific)
+# Power BI Desktop user-local cache and settings (machine-specific)
 **/.pbi/localSettings.json
+**/.pbi/editorSettings.json
+**/.pbi/cache.abf
 
 # OS
 .DS_Store

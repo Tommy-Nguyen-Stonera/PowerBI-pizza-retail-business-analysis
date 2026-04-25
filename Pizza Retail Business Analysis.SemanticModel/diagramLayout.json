@@ -10,21 +10,8 @@
       "nodes": [
         {
           "location": {
-            "x": 945.75485929246588,
-            "y": 317.55370143398591
-          },
-          "nodeIndex": "daily revenue",
-          "nodeLineageTag": "663c8860-1d95-4754-b7e3-f05a05360801",
-          "size": {
-            "height": 176,
-            "width": 234
-          },
-          "zIndex": 0
-        },
-        {
-          "location": {
-            "x": 340.69862740359753,
-            "y": 131.83708692215964
+            "x": 448.69862740359753,
+            "y": 20
           },
           "nodeIndex": "Data_pizza",
           "nodeLineageTag": "8f89507e-aada-4cf0-a35c-a96a576248cb",
@@ -36,8 +23,8 @@
         },
         {
           "location": {
-            "x": 630.55742059838667,
-            "y": 461.10740286797204
+            "x": 308.55742059838667,
+            "y": 389.10740286797204
           },
           "nodeIndex": "Dim_Date",
           "nodeLineageTag": "ed5d953e-46b2-4423-9790-fe6091418369",
@@ -49,8 +36,8 @@
         },
         {
           "location": {
-            "x": 53.614978509931461,
-            "y": 324.62735439376331
+            "x": 8,
+            "y": 387.62735439376331
           },
           "nodeIndex": "dim_pizza",
           "nodeLineageTag": "e33ebbfa-2e03-440d-912b-06cbc78bc4c1",
@@ -62,8 +49,8 @@
         },
         {
           "location": {
-            "x": 520.29768215931961,
-            "y": -50
+            "x": 907.29768215931972,
+            "y": 389
           },
           "nodeIndex": "dim_size",
           "nodeLineageTag": "6e94e958-8c91-4d4c-ac29-f01e0fd10047",
@@ -75,8 +62,8 @@
         },
         {
           "location": {
-            "x": 711.75485929246577,
-            "y": 156.30615613426562
+            "x": 612.75485929246577,
+            "y": 391.30615613426562
           },
           "nodeIndex": "Dim_Time",
           "nodeLineageTag": "6c2556cc-ea83-489a-bc41-6aceff0f2f0a",
@@ -88,8 +75,8 @@
         },
         {
           "location": {
-            "x": 50,
-            "y": 98.487772890528049
+            "x": 11,
+            "y": 679.487772890528
           },
           "nodeIndex": "Ingredients Normalised",
           "nodeLineageTag": "b9fa6486-2c1a-45e4-82c5-2fd1b9892ce1",
@@ -101,8 +88,8 @@
         },
         {
           "location": {
-            "x": 1229.7548592924659,
-            "y": 255.55370143398591
+            "x": 1103.7548592924659,
+            "y": 10.553701433985907
           },
           "nodeIndex": "measurements",
           "nodeLineageTag": "63141942-39a4-485c-8d02-306907c086f4",
@@ -114,52 +101,13 @@
         },
         {
           "location": {
-            "x": 1513.7548592924659,
-            "y": 317.55370143398591
-          },
-          "nodeIndex": "Order Summary Table",
-          "nodeLineageTag": "1b13b507-a7e2-4430-8fd8-8a72a0d455b3",
-          "size": {
-            "height": 176,
-            "width": 234
-          },
-          "zIndex": 0
-        },
-        {
-          "location": {
-            "x": 1797.7548592924659,
-            "y": 293.55370143398591
+            "x": 1368.7548592924659,
+            "y": 10.553701433985907
           },
           "nodeIndex": "Pizza Category",
           "nodeLineageTag": "fdda7280-ce1e-4017-af64-a2ec60054f0f",
           "size": {
             "height": 224,
-            "width": 234
-          },
-          "zIndex": 0
-        },
-        {
-          "location": {
-            "x": 2081.7548592924659,
-            "y": 329.55370143398591
-          },
-          "nodeIndex": "Pizza Pair Counts",
-          "nodeLineageTag": "59117907-ee46-40b2-b389-f66d8f067925",
-          "size": {
-            "height": 152,
-            "width": 234
-          },
-          "zIndex": 0
-        },
-        {
-          "location": {
-            "x": 2365.7548592924659,
-            "y": 281.55370143398591
-          },
-          "nodeIndex": "Slicer Toggle",
-          "nodeLineageTag": "3f5005e0-2c21-4701-a856-639d6803d2f2",
-          "size": {
-            "height": 248,
             "width": 234
           },
           "zIndex": 0
