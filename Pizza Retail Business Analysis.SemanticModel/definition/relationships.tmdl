@@ -1,8 +1,3 @@
-relationship 6527e6a0-3042-4e34-b027-15ee71acdb54
-	joinOnDateBehavior: datePartOnly
-	fromColumn: 'daily revenue'.date
-	toColumn: LocalDateTable_c2a39ff7-3de9-40d4-803a-bd18b7ee9de4.Date
-
 relationship 25f12464-22a6-49df-bc39-9c0b76544769
 	joinOnDateBehavior: datePartOnly
 	fromColumn: Dim_Time.DateTime
@@ -32,9 +27,4 @@ relationship 347a3315-f3ae-3b92-8867-cbcf964b5c1e
 relationship af3914ba-5218-b5dd-8b93-82db4f777447
 	fromColumn: 'Ingredients Normalised'.pizza_id
 	toColumn: dim_pizza.pizza_id
-
-relationship ae2bcb3b-152e-486a-889a-7b0fbba9b44f
-	joinOnDateBehavior: datePartOnly
-	fromColumn: 'Order Summary Table'.OrderTime
-	toColumn: LocalDateTable_cc5b4035-f5a7-477a-a4cf-21f98dd2fdef.Date
 

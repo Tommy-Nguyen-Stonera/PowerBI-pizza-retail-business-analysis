@@ -10,9 +10,8 @@ annotation __PBI_TimeIntelligenceEnabled = 1
 
 annotation PBI_ProTooling = ["DevMode"]
 
-annotation PBI_QueryOrder = ["Data_pizza","daily revenue","Ingredients Normalised"]
+annotation PBI_QueryOrder = ["Data_pizza","Ingredients Normalised"]
 
-ref table 'daily revenue'
 ref table Data_pizza
 ref table DateTableTemplate_06ef3485-3bc9-4c99-9f57-be7957bff0d5
 ref table Dim_Date
@@ -22,13 +21,8 @@ ref table Dim_Time
 ref table 'Ingredients Normalised'
 ref table LocalDateTable_ad2eb87c-7048-4a5a-9546-52454c536dad
 ref table LocalDateTable_b637c308-ce40-484e-ab4f-6621592cc1bd
-ref table LocalDateTable_c2a39ff7-3de9-40d4-803a-bd18b7ee9de4
-ref table LocalDateTable_cc5b4035-f5a7-477a-a4cf-21f98dd2fdef
 ref table measurements
-ref table 'Order Summary Table'
 ref table 'Pizza Category'
-ref table 'Pizza Pair Counts'
-ref table 'Slicer Toggle'
 
 ref cultureInfo en-AU
 
