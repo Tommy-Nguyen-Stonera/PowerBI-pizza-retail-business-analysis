@@ -1,6 +1,10 @@
 # Pizza Retail Business Analysis
 
-**[Open the live report](https://pizza-retail-analysis.vercel.app)**
+**[Open the interactive Power BI report](https://app.fabric.microsoft.com/links/7zo8soveih?ctid=7d8ea17c-1508-47c2-a16f-cf6d618a31a5&pbi_source=linkShare)**
+Live on Power BI Service. Slicers, cross-filtering, drill-down, and tooltips all work the way they do in Desktop. Best viewed on a laptop or wider.
+
+**[Open the static web version](https://pizza-retail-analysis.vercel.app)**
+Same five pages, exported to plain HTML. Loads instantly and needs no sign-in, at the cost of the interactive filters.
 
 A year of pizza transactions, cleaned up and turned into five pages that tell a shop owner where the money comes from and what to do about it. The last page is a short list of actions. That was the goal from the start.
 
@@ -58,4 +62,4 @@ Five pages, one per question, in that order.
 
 ## Tools
 
-Power BI Desktop (PBIR project format), DAX, Power Query (M), Excel. The Vercel site is plain static HTML with a small CSS grid and a scrollspy script. No framework.
+Power BI Desktop (PBIR project format), DAX, Power Query (M), Excel. Published to Power BI Service (Microsoft Fabric) for the interactive link above. The Vercel site is plain static HTML with a small CSS grid and a scrollspy script. No framework.
