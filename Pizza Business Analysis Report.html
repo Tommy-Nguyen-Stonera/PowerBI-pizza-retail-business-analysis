@@ -420,19 +420,15 @@ pre {
     </ul>
 <p>Important caveat up front. The data is transactional only. There are no customer IDs, no costs, no store locations, no staff rosters. Every conclusion on every page is topline, and every recommendation is a revenue bet rather than a margin bet. Keep that in the back of your head.</p>
 <section class="page-block" id="page1">
-  <h1 class="page-head"><span class="num">P1</span>Executive Summary</h1>
-
-  <h2 class="block-head" id="page1-q">Question</h2>
-  <div class="guiding-q">How's the business doing, and is anything moving fast enough that I should care?</div>
-
-  <h2 class="block-head" id="page1-flow">Flow</h2>
-  <ol class="flow"><li>Start with the four headline numbers. Total Revenue, Orders, AOV, Basket. Boring but necessary, and the rest of the report sits on top of them.</li><li>Every one of them gets a YoY delta stamped underneath. A number without motion is a photograph, not a story.</li><li>The daily line is noisy. Read the 7-day moving average instead, that's the actual trajectory.</li><li>Then the concentration question. If the top five pizzas own most of the revenue, every downstream recommendation has to respect that.</li></ol>
-
-  <h2 class="block-head" id="page1-graphs">Graphs</h2>
-  <ul class="graph-list"><li><span class="g-id">exec_kpi_*</span><span class="g-type">KPI row</span><span class="g-purpose">The four headline numbers with a YoY delta on each one.</span></li><li><span class="g-id">exec_trend</span><span class="g-type">Line chart</span><span class="g-purpose">Daily revenue (noisy) with a 7-day moving average overlaid in green. Read the green line.</span></li><li><span class="g-id">exec_donut_cat</span><span class="g-type">Donut</span><span class="g-purpose">Revenue share by category. Biggest slice first.</span></li><li><span class="g-id">exec_top5</span><span class="g-type">Bar + share</span><span class="g-purpose">Top 5 pizzas and the share of revenue they own.</span></li></ul>
-
-  <h2 class="block-head" id="page1-fns">DAX</h2>
-  <div class="measure-name">Total Revenue</div>
+<h1 class="page-head"><span class="num">P1</span>Executive Summary</h1>
+<h2 class="block-head" id="page1-q">Question</h2>
+<div class="guiding-q">How's the business doing, and is anything moving fast enough that I should care?</div>
+<h2 class="block-head" id="page1-flow">Flow</h2>
+<ol class="flow"><li>Start with the four headline numbers. Total Revenue, Orders, AOV, Basket. Boring but necessary, and the rest of the report sits on top of them.</li><li>Every one of them gets a YoY delta stamped underneath. A number without motion is a photograph, not a story.</li><li>The daily line is noisy. Read the 7-day moving average instead, that's the actual trajectory.</li><li>Then the concentration question. If the top five pizzas own most of the revenue, every downstream recommendation has to respect that.</li></ol>
+<h2 class="block-head" id="page1-graphs">Graphs</h2>
+<ul class="graph-list"><li><span class="g-id">exec_kpi_*</span><span class="g-type">KPI row</span><span class="g-purpose">The four headline numbers with a YoY delta on each one.</span></li><li><span class="g-id">exec_trend</span><span class="g-type">Line chart</span><span class="g-purpose">Daily revenue (noisy) with a 7-day moving average overlaid in green. Read the green line.</span></li><li><span class="g-id">exec_donut_cat</span><span class="g-type">Donut</span><span class="g-purpose">Revenue share by category. Biggest slice first.</span></li><li><span class="g-id">exec_top5</span><span class="g-type">Bar + share</span><span class="g-purpose">Top 5 pizzas and the share of revenue they own.</span></li></ul>
+<h2 class="block-head" id="page1-fns">DAX</h2>
+<div class="measure-name">Total Revenue</div>
 <pre>SUMX(Data_pizza, Data_pizza[quantity] * Data_pizza[price])</pre><div class="measure-name">Revenue YoY %</div>
 <pre>VAR _C = [Total Revenue]
 VAR _P = CALCULATE([Total Revenue], SAMEPERIODLASTYEAR(Dim_Date[Date]))
@@ -442,24 +438,18 @@ RETURN DIVIDE(CALCULATE([Total Revenue], _R), 7)</pre><div class="measure-name">
 <pre>VAR _T5 = TOPN(5, VALUES(Data_pizza[name]), [Total Revenue], DESC)
 RETURN DIVIDE(CALCULATE([Total Revenue], _T5),
     CALCULATE([Total Revenue], ALL(Data_pizza[name])))</pre>
-
-  <h2 class="block-head" id="page1-gap">Gaps</h2>
-  <div class="gap"><strong>Why</strong> the business is growing isn't on this page. Could be more orders, heavier baskets, a price hike, or a good quarter for a specific category. The next three pages take that apart.</div><div class="handoff"><span class="label">Next</span>Whether demand is consistent or spiky goes on page 2. Volume vs price is a page 3 question.</div>
+<div class="handoff"><span class="label">Next</span>Whether demand is consistent or spiky goes on page 2. Volume vs price is a page 3 question.</div>
 </section>
 <section class="page-block" id="page2">
-  <h1 class="page-head"><span class="num">P2</span>Demand Rhythm</h1>
-
-  <h2 class="block-head" id="page2-q">Question</h2>
-  <div class="guiding-q">When does the money come in, and is the rhythm stable enough to staff against it?</div>
-
-  <h2 class="block-head" id="page2-flow">Flow</h2>
-  <ol class="flow"><li>The heatmap is the whole page. A year of hourly orders, flattened into one picture.</li><li>The dark-red blocks are peaks. The hourly and weekday bars underneath are sanity checks in case one giant Friday is dragging an average around.</li><li>MTD pacing is the only forward-looking thing on the page. If it's red, this month is running below the same day last month, and someone needs to know before month-end rather than at it.</li></ol>
-
-  <h2 class="block-head" id="page2-graphs">Graphs</h2>
-  <ul class="graph-list"><li><span class="g-id">dem_heat</span><span class="g-type">Weekday by hour heatmap</span><span class="g-purpose">Revenue intensity per slot. The redder the cell, the busier that hour of that weekday.</span></li><li><span class="g-id">dem_hourly</span><span class="g-type">Column</span><span class="g-purpose">Revenue by hour of day, all weekdays pooled.</span></li><li><span class="g-id">dem_dow</span><span class="g-type">Bar</span><span class="g-purpose">Revenue by weekday.</span></li><li><span class="g-id">dem_ident_*</span><span class="g-type">KPI tiles</span><span class="g-purpose">Peak hour, weekend vs weekday, MTD pacing.</span></li></ul>
-
-  <h2 class="block-head" id="page2-fns">DAX</h2>
-  <div class="measure-name">Peak Hour Revenue</div>
+<h1 class="page-head"><span class="num">P2</span>Demand Rhythm</h1>
+<h2 class="block-head" id="page2-q">Question</h2>
+<div class="guiding-q">When does the money come in, and is the rhythm stable enough to staff against it?</div>
+<h2 class="block-head" id="page2-flow">Flow</h2>
+<ol class="flow"><li>The heatmap is the whole page. A year of hourly orders, flattened into one picture.</li><li>The dark-red blocks are peaks. The hourly and weekday bars underneath are sanity checks in case one giant Friday is dragging an average around.</li><li>MTD pacing is the only forward-looking thing on the page. If it's red, this month is running below the same day last month, and someone needs to know before month-end rather than at it.</li></ol>
+<h2 class="block-head" id="page2-graphs">Graphs</h2>
+<ul class="graph-list"><li><span class="g-id">dem_heat</span><span class="g-type">Weekday by hour heatmap</span><span class="g-purpose">Revenue intensity per slot. The redder the cell, the busier that hour of that weekday.</span></li><li><span class="g-id">dem_hourly</span><span class="g-type">Column</span><span class="g-purpose">Revenue by hour of day, all weekdays pooled.</span></li><li><span class="g-id">dem_dow</span><span class="g-type">Bar</span><span class="g-purpose">Revenue by weekday.</span></li><li><span class="g-id">dem_ident_*</span><span class="g-type">KPI tiles</span><span class="g-purpose">Peak hour, weekend vs weekday, MTD pacing.</span></li></ul>
+<h2 class="block-head" id="page2-fns">DAX</h2>
+<div class="measure-name">Peak Hour Revenue</div>
 <pre>MAXX(VALUES(Dim_Time[Order Hour]), [Total Revenue])</pre><div class="measure-name">Weekend Revenue</div>
 <pre>CALCULATE([Total Revenue], Dim_Date[WeekdayNo] IN {6,7})</pre><div class="measure-name">Revenue MTD Prior</div>
 <pre>VAR _D = DAY(MAX(Dim_Date[Date]))
@@ -472,24 +462,19 @@ RETURN CALCULATE([Total Revenue],
 VAR _A = CALCULATE(AVERAGEX(VALUES(Dim_Time[Order Hour]), [Total Revenue]),
     ALL(Dim_Time[Order Hour]))
 RETURN DIVIDE(_C - _A, _A)</pre>
-
-  <h2 class="block-head" id="page2-gap">Gaps</h2>
-  <div class="gap"><strong>Why</strong> a slot is busy, the heatmap can't tell you. One catering order of forty pizzas looks identical to forty one-pizza orders. Basket shape lives on page 4.</div><div class="gap"><strong>External drivers</strong> like weather, events, marketing, payday aren't in the file. A Friday spike is just a Friday spike here.</div><div class="handoff"><span class="label">Next</span>Page 3 is where I ask which pizzas actually ride the peak.</div>
+<h2 class="block-head" id="page2-gap">Gaps</h2>
+<div class="gap"><strong>Why</strong> a slot is busy, the heatmap can't tell you. One catering order of forty pizzas looks identical to forty one-pizza orders. Basket shape lives on page 4.</div><div class="gap"><strong>External drivers</strong> like weather, events, marketing, payday aren't in the file. A Friday spike is just a Friday spike here.</div><div class="handoff"><span class="label">Next</span>Page 3 is where I ask which pizzas actually ride the peak.</div>
 </section>
 <section class="page-block" id="page3">
-  <h1 class="page-head"><span class="num">P3</span>Menu Performance</h1>
-
-  <h2 class="block-head" id="page3-q">Question</h2>
-  <div class="guiding-q">Is the revenue coming from a few heroes, or spread across a long tail?</div>
-
-  <h2 class="block-head" id="page3-flow">Flow</h2>
-  <ol class="flow"><li>Put every SKU on one chart. Price on the X, quantity on the Y. That's the entire menu in one picture, which is the whole reason this visual earns the biggest real estate on the page.</li><li>Median reference lines slice the chart into four zones. A blob of dots becomes four decision buckets.</li><li>The Pearson coefficient next to the chart is the sanity check. Strongly negative means the classic price-elastic story holds. Near zero means something else is driving it, and I'd go look.</li><li>The category and size bars are cross-checks, not headlines. Glance, confirm, move on.</li></ol>
-
-  <h2 class="block-head" id="page3-graphs">Graphs</h2>
-  <ul class="graph-list"><li><span class="g-id">sell_scatter</span><span class="g-type">Quadrant scatter</span><span class="g-purpose">Price vs quantity per SKU with median reference lines. Quadrants are the decision frame.</span></li><li><span class="g-id">sell_cat_rev</span><span class="g-type">Bar</span><span class="g-purpose">Revenue by category, sorted down.</span></li><li><span class="g-id">sell_size_bar</span><span class="g-type">Bar</span><span class="g-purpose">Revenue by size.</span></li></ul>
-
-  <h2 class="block-head" id="page3-fns">DAX</h2>
-  <div class="measure-name">Median Pizza Price</div>
+<h1 class="page-head"><span class="num">P3</span>Menu Performance</h1>
+<h2 class="block-head" id="page3-q">Question</h2>
+<div class="guiding-q">Is the revenue coming from a few heroes, or spread across a long tail?</div>
+<h2 class="block-head" id="page3-flow">Flow</h2>
+<ol class="flow"><li>Put every SKU on one chart. Price on the X, quantity on the Y. That's the entire menu in one picture, which is the whole reason this visual earns the biggest real estate on the page.</li><li>Median reference lines slice the chart into four zones. A blob of dots becomes four decision buckets.</li><li>The Pearson coefficient next to the chart is the sanity check. Strongly negative means the classic price-elastic story holds. Near zero means something else is driving it, and I'd go look.</li><li>The category and size bars are cross-checks, not headlines. Glance, confirm, move on.</li></ol>
+<h2 class="block-head" id="page3-graphs">Graphs</h2>
+<ul class="graph-list"><li><span class="g-id">sell_scatter</span><span class="g-type">Quadrant scatter</span><span class="g-purpose">Price vs quantity per SKU with median reference lines. Quadrants are the decision frame.</span></li><li><span class="g-id">sell_cat_rev</span><span class="g-type">Bar</span><span class="g-purpose">Revenue by category, sorted down.</span></li><li><span class="g-id">sell_size_bar</span><span class="g-type">Bar</span><span class="g-purpose">Revenue by size.</span></li></ul>
+<h2 class="block-head" id="page3-fns">DAX</h2>
+<div class="measure-name">Median Pizza Price</div>
 <pre>MEDIANX(VALUES(Data_pizza[name]), CALCULATE([Avg Pizza Price]))</pre><div class="measure-name">Median Pizza Volume</div>
 <pre>MEDIANX(VALUES(Data_pizza[name]), CALCULATE([Total Quantity]))</pre><div class="measure-name">Correlation Coefficient</div>
 <pre>VAR _T = ADDCOLUMNS(VALUES(Data_pizza[category]),
@@ -501,24 +486,18 @@ VAR _N  = SUMX(_T, ([@X] - _AX) * ([@Y] - _AY))
 VAR _DX = SQRT(SUMX(_T, ([@X] - _AX) ^ 2))
 VAR _DY = SQRT(SUMX(_T, ([@Y] - _AY) ^ 2))
 RETURN DIVIDE(_N, _DX * _DY)</pre>
-
-  <h2 class="block-head" id="page3-gap">Gaps</h2>
-  <div class="gap"><strong>Margin is unknown</strong>, so the ranking is revenue. A premium low-volume pizza might quietly be the highest-margin product in the menu, and this page will make it look like a dud. Keep that caveat with you.</div><div class="gap"><strong>Standalone vs basket</strong> is hidden at SKU level. A pizza sold alone and one that only sells as an add-on look identical on this chart. Page 4 is where that gets checked.</div><div class="handoff"><span class="label">Next</span>Next question is whether these pizzas are bought alone or together.</div>
+<div class="handoff"><span class="label">Next</span>Next question is whether these pizzas are bought alone or together. The margin caveat from the Overview stands, so don't retire anything on the strength of this page alone.</div>
 </section>
 <section class="page-block" id="page4">
-  <h1 class="page-head"><span class="num">P4</span>Order Behaviour</h1>
-
-  <h2 class="block-head" id="page4-q">Question</h2>
-  <div class="guiding-q">How do customers actually order, and does the basket data change anything I thought about the menu?</div>
-
-  <h2 class="block-head" id="page4-flow">Flow</h2>
-  <ol class="flow"><li>Stop thinking about pizzas for a second and go one level down. Ingredients are the supply-side reality. If Mozzarella disappears from the supplier on a Tuesday, half the menu disappears with it.</li><li>The ingredient scatter plots quantity and revenue reach across every recipe. Top right is the list of things I really don't want to run out of on a Friday night.</li><li>Then the basket shape. Multi-Item vs Single-Item, and the distribution of order sizes. If multi-item dominates, the lever is bundles and upsells. If it doesn't, the lever is per-SKU quality and price.</li></ol>
-
-  <h2 class="block-head" id="page4-graphs">Graphs</h2>
-  <ul class="graph-list"><li><span class="g-id">ins_ingredient</span><span class="g-type">Scatter</span><span class="g-purpose">Each ingredient plotted by how much volume and revenue it touches across the menu.</span></li><li><span class="g-id">ins_ingredient_stats</span><span class="g-type">PivotTable (FillRule)</span><span class="g-purpose">Ingredient table. Background colour is bound to the metric, hot rows are above median.</span></li><li><span class="g-id">ins_ordertype</span><span class="g-type">Column</span><span class="g-purpose">Single-Item vs Multi-Item orders, side by side.</span></li><li><span class="g-id">ins_basket_size</span><span class="g-type">Histogram</span><span class="g-purpose">Order sizes. Read the mode and read the tail. A fat tail means there's a catering segment hiding.</span></li></ul>
-
-  <h2 class="block-head" id="page4-fns">DAX</h2>
-  <div class="measure-name">Multi-Item Order %</div>
+<h1 class="page-head"><span class="num">P4</span>Order Behaviour</h1>
+<h2 class="block-head" id="page4-q">Question</h2>
+<div class="guiding-q">How do customers actually order, and does the basket data change anything I thought about the menu?</div>
+<h2 class="block-head" id="page4-flow">Flow</h2>
+<ol class="flow"><li>Stop thinking about pizzas for a second and go one level down. Ingredients are the supply-side reality. If Mozzarella disappears from the supplier on a Tuesday, half the menu disappears with it.</li><li>The ingredient scatter plots quantity and revenue reach across every recipe. Top right is the list of things I really don't want to run out of on a Friday night.</li><li>Then the basket shape. Multi-Item vs Single-Item, and the distribution of order sizes. If multi-item dominates, the lever is bundles and upsells. If it doesn't, the lever is per-SKU quality and price.</li></ol>
+<h2 class="block-head" id="page4-graphs">Graphs</h2>
+<ul class="graph-list"><li><span class="g-id">ins_ingredient</span><span class="g-type">Scatter</span><span class="g-purpose">Each ingredient plotted by how much volume and revenue it touches across the menu.</span></li><li><span class="g-id">ins_ingredient_stats</span><span class="g-type">PivotTable (FillRule)</span><span class="g-purpose">Ingredient table. Background colour is bound to the metric, hot rows are above median.</span></li><li><span class="g-id">ins_ordertype</span><span class="g-type">Column</span><span class="g-purpose">Single-Item vs Multi-Item orders, side by side.</span></li><li><span class="g-id">ins_basket_size</span><span class="g-type">Histogram</span><span class="g-purpose">Order sizes. Read the mode and read the tail. A fat tail means there's a catering segment hiding.</span></li></ul>
+<h2 class="block-head" id="page4-fns">DAX</h2>
+<div class="measure-name">Multi-Item Order %</div>
 <pre>DIVIDE(
     CALCULATE(DISTINCTCOUNT(Data_pizza[order_id]),
         Data_pizza[Order Type] = "Multi-Item"),
@@ -531,24 +510,19 @@ RETURN DIVIDE(_N, _DX * _DY)</pre>
                 'Ingredients Normalised'[Ingredient] =
                 SELECTEDVALUE('Ingredients Normalised'[Ingredient])),
             "pizza_id", 'Ingredients Normalised'[pizza_id])))</pre>
-
-  <h2 class="block-head" id="page4-gap">Gaps</h2>
-  <div class="gap"><strong>No customer ID</strong>. So I can't say 'this person comes back every Friday'. There's no cohort, no retention rate, no repeat-order number. Just orders.</div><div class="gap">Anything that happens <strong>across visits</strong> is invisible. The ceiling for basket analysis is one order, and I had to take the engineering round to swallow that.</div><div class="handoff"><span class="label">Next</span>Last page stops being description and starts being recommendations.</div>
+<h2 class="block-head" id="page4-gap">Gaps</h2>
+<div class="gap"><strong>No customer ID</strong>. So I can't say 'this person comes back every Friday'. There's no cohort, no retention rate, no repeat-order number. Just orders.</div><div class="gap">Anything that happens <strong>across visits</strong> is invisible. The ceiling for basket analysis is one order, and I had to take the engineering round to swallow that.</div><div class="handoff"><span class="label">Next</span>Last page stops being description and starts being recommendations.</div>
 </section>
 <section class="page-block" id="page5">
-  <h1 class="page-head"><span class="num">P5</span>Action &amp; Decisions</h1>
-
-  <h2 class="block-head" id="page5-q">Question</h2>
-  <div class="guiding-q">What do I actually do next week, and how will I know it worked?</div>
-
-  <h2 class="block-head" id="page5-flow">Flow</h2>
-  <ol class="flow"><li>Rank every SKU by revenue and slap the month-over-month rank change right next to it. Climbers and fallers stop hiding in the table.</li><li>Three buckets come out of it. Protect is the top decile, the list that should never run out of stock and never get repriced without a test. Test-retire is the bottom decile on revenue and volume together. Promote is the premium but quiet corner from page 3.</li><li>HHI sits on the page as a concentration gauge. A big Protect list with a high HHI is also a fragility list, and that's a different read.</li><li>If a recommendation doesn't have a metric that moves when it works, it's a wish rather than a test. I have a rule about that.</li></ol>
-
-  <h2 class="block-head" id="page5-graphs">Graphs</h2>
-  <ul class="graph-list"><li><span class="g-id">perf_top</span><span class="g-type">Ranked list</span><span class="g-purpose">Top 10 SKUs. This is the Protect list.</span></li><li><span class="g-id">perf_bot</span><span class="g-type">Ranked list</span><span class="g-purpose">Bottom 10 SKUs. This is the Test-retire candidate list.</span></li><li><span class="g-id">perf_rank</span><span class="g-type">Rank table</span><span class="g-purpose">All SKUs with share, AOV, and rank-delta columns.</span></li><li><span class="g-id">perf_hhi</span><span class="g-type">KPI tile</span><span class="g-purpose">Category concentration (HHI). Close to 1 means fragile, near 1/N means spread out.</span></li></ul>
-
-  <h2 class="block-head" id="page5-fns">DAX</h2>
-  <div class="measure-name">Rank Pizza by Revenue</div>
+<h1 class="page-head"><span class="num">P5</span>Action &amp; Decisions</h1>
+<h2 class="block-head" id="page5-q">Question</h2>
+<div class="guiding-q">What do I actually do next week, and how will I know it worked?</div>
+<h2 class="block-head" id="page5-flow">Flow</h2>
+<ol class="flow"><li>Rank every SKU by revenue and slap the month-over-month rank change right next to it. Climbers and fallers stop hiding in the table.</li><li>Three buckets come out of it. Protect is the top decile, the list that should never run out of stock and never get repriced without a test. Test-retire is the bottom decile on revenue and volume together. Promote is the premium but quiet corner from page 3.</li><li>HHI sits on the page as a concentration gauge. A big Protect list with a high HHI is also a fragility list, and that's a different read.</li><li>If a recommendation doesn't have a metric that moves when it works, it's a wish rather than a test. I have a rule about that.</li></ol>
+<h2 class="block-head" id="page5-graphs">Graphs</h2>
+<ul class="graph-list"><li><span class="g-id">perf_top</span><span class="g-type">Ranked list</span><span class="g-purpose">Top 10 SKUs. This is the Protect list.</span></li><li><span class="g-id">perf_bot</span><span class="g-type">Ranked list</span><span class="g-purpose">Bottom 10 SKUs. This is the Test-retire candidate list.</span></li><li><span class="g-id">perf_rank</span><span class="g-type">Rank table</span><span class="g-purpose">All SKUs with share, AOV, and rank-delta columns.</span></li><li><span class="g-id">perf_hhi</span><span class="g-type">KPI tile</span><span class="g-purpose">Category concentration (HHI). Close to 1 means fragile, near 1/N means spread out.</span></li></ul>
+<h2 class="block-head" id="page5-fns">DAX</h2>
+<div class="measure-name">Rank Pizza by Revenue</div>
 <pre>RANKX(ALL(Data_pizza[name]), [Total Revenue], , DESC, Dense)</pre><div class="measure-name">SKU Rank Delta</div>
 <pre>VAR _C = [Rank Pizza by Revenue]
 VAR _P = RANKX(ALL(Data_pizza[name]),
@@ -570,9 +544,6 @@ VAR _P = CALCULATETABLE(
     TREATAS(_O, Data_pizza[order_id]),
     Data_pizza[name] &lt;&gt; _C)
 RETURN CONCATENATEX(TOPN(1, _P, [_c], DESC), Data_pizza[name])</pre>
-
-  <h2 class="block-head" id="page5-gap">Gaps</h2>
-  <div class="gap"><strong>No cost data.</strong> Every recommendation on this page is a revenue-impact estimate, not a profit one. Any Retire decision should be checked against cost before it becomes permanent, and I would not skip that step.</div>
 </section>
 <h1 class="ref-head" id="model">Data model</h1>
 <p>A light star schema. One fact table, a handful of dimensions, two bridges, and a calculated table that exists only to hold measures.</p>
@@ -610,7 +581,6 @@ RETURN CONCATENATEX(TOPN(1, _P, [_c], DESC), Data_pizza[name])</pre>
 <li><a href="#page1-flow">Flow</a></li>
 <li><a href="#page1-graphs">Graphs</a></li>
 <li><a href="#page1-fns">DAX</a></li>
-<li><a href="#page1-gap">Gaps</a></li>
 </ul>
 </li>
 <li><a href="#page2">Page 2. Demand</a>
@@ -628,7 +598,6 @@ RETURN CONCATENATEX(TOPN(1, _P, [_c], DESC), Data_pizza[name])</pre>
 <li><a href="#page3-flow">Flow</a></li>
 <li><a href="#page3-graphs">Graphs</a></li>
 <li><a href="#page3-fns">DAX</a></li>
-<li><a href="#page3-gap">Gaps</a></li>
 </ul>
 </li>
 <li><a href="#page4">Page 4. Behaviour</a>
@@ -646,7 +615,6 @@ RETURN CONCATENATEX(TOPN(1, _P, [_c], DESC), Data_pizza[name])</pre>
 <li><a href="#page5-flow">Flow</a></li>
 <li><a href="#page5-graphs">Graphs</a></li>
 <li><a href="#page5-fns">DAX</a></li>
-<li><a href="#page5-gap">Gaps</a></li>
 </ul>
 </li>
 <li><a href="#model">Data model</a>

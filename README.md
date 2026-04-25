@@ -10,14 +10,12 @@ A year of pizza transactions, cleaned up and turned into five pages that tell a 
 |---|---|
 | `Pizza Retail Business Analysis.pbip` | The pointer file. Open this in Power BI Desktop. |
 | `Pizza Retail Business Analysis.Report/` | Report layer. All pages, visuals, theme, bookmarks. |
-| `Pizza Retail Business Analysis.SemanticModel/` | Data model. Tables, DAX measures, M queries. |
-| `Pizza Retail Business Analysis.pbix` | The old single-file format. Keep it around for older Desktop versions, but the pbip tree above is the source of truth. |
-| `Pizza Business Analysis Report.html` | The static companion site. Same content as the Vercel link. |
+| `Pizza Retail Business Analysis.SemanticModel/` | The model behind the report. Tables, calculated measures, query steps. You won't open this folder directly. Power BI loads it for you when you open the .pbip. |
+| `Pizza Business Analysis Report.html` | Static companion site. Same content as the Vercel link. |
 | `data_pizza.xlsx` | Raw transactions, one year. |
 | `data_dictionary.xlsx` | Column reference. Open this before you guess what a column means. |
-| `vercel/` | The deployable site source. Clone and `vercel --prod` if you want your own copy. |
 
-I edit the pbip JSON and TMDL directly, so the pbix lags behind. If you want the current state, open the pbip.
+If you need a single-file download, grab the zipped pbip from the live site. The button on the report page pulls the same tree above, packaged so Desktop can open it in one go.
 
 ## The data
 
@@ -47,7 +45,7 @@ Five pages, one per question, in that order.
 
 1. Friday wins the week. The weekend holds up. Tuesday and Wednesday are the quiet stretch where nothing much happens.
 2. Classic pizza outsells everything else, and it isn't close. Supreme is a respectable second. Veggie and Chicken are far behind.
-3. Two time windows carry the day: lunch at 12 to 1, and dinner from 5 to 7. Those hours do most of the work.
+3. Two time windows carry the day. Lunch from twelve to one, dinner from five to seven. Those hours do most of the work.
 4. Thanksgiving was the single biggest day of the year. Holiday weekends are predictable events, not surprises, so they should be planned.
 5. Large pizzas bring in the most revenue. XL and XXL are low volume but high ticket value. That's a segment with room to grow.
 
@@ -61,19 +59,3 @@ Five pages, one per question, in that order.
 ## Tools
 
 Power BI Desktop (PBIR project format), DAX, Power Query (M), Excel. The Vercel site is plain static HTML with a small CSS grid and a scrollspy script. No framework.
-
-## Running the Vercel site locally
-
-```bash
-cd vercel
-npx vercel dev
-```
-
-Or push your own copy:
-
-```bash
-cd vercel
-vercel --prod --yes
-```
-
-If you spot something off or want to argue with a recommendation, open an issue on the repo.
