@@ -1,10 +1,7 @@
 # Pizza Retail Business Analysis
 
-**[Open the interactive Power BI report](https://app.fabric.microsoft.com/links/7zo8soveih?ctid=7d8ea17c-1508-47c2-a16f-cf6d618a31a5&pbi_source=linkShare)**
-Live on Power BI Service. Slicers, cross-filtering, drill-down, and tooltips all work the way they do in Desktop. Best viewed on a laptop or wider.
-
-**[Open the static web version](https://pizza-retail-analysis.vercel.app)**
-Same five pages, exported to plain HTML. Loads instantly and needs no sign-in, at the cost of the interactive filters.
+**[Power BI dashboard](https://pizza-retail-analysis.vercel.app)**
+Live and embedded in the browser. No login. Slicers, cross-filtering, drill-down, and tooltips all work the way they do in Desktop. Best viewed on a laptop or wider. Click the page tabs at the bottom of the dashboard to move between the five pages.
 
 A year of pizza transactions, cleaned up and turned into five pages that tell a shop owner where the money comes from and what to do about it. The last page is a short list of actions. That was the goal from the start.
 
@@ -15,7 +12,7 @@ A year of pizza transactions, cleaned up and turned into five pages that tell a 
 | `Pizza Retail Business Analysis.pbip` | The pointer file. Open this in Power BI Desktop. |
 | `Pizza Retail Business Analysis.Report/` | Report layer. All pages, visuals, theme, bookmarks. |
 | `Pizza Retail Business Analysis.SemanticModel/` | The model behind the report. Tables, calculated measures, query steps. You won't open this folder directly. Power BI loads it for you when you open the .pbip. |
-| `Pizza Business Analysis Report.html` | Static companion site. Same content as the Vercel link. |
+| `Pizza Business Analysis Report.html` | Standalone HTML walkthrough of the same five pages. Useful as offline reference. |
 | `data_pizza.xlsx` | Raw transactions, one year. |
 | `data_dictionary.xlsx` | Column reference. Open this before you guess what a column means. |
 
@@ -62,4 +59,4 @@ Five pages, one per question, in that order.
 
 ## Tools
 
-Power BI Desktop (PBIR project format), DAX, Power Query (M), Excel. Published to Power BI Service (Microsoft Fabric) for the interactive link above. The Vercel site is plain static HTML with a small CSS grid and a scrollspy script. No framework.
+Power BI Desktop (PBIR project format), DAX, Power Query (M), Excel. Published to Power BI Service (Microsoft Fabric) and embedded in a Vercel-hosted page so visitors can interact with the dashboard directly in the browser without signing in.
